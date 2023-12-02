@@ -7,31 +7,36 @@ import android.database.Cursor
 import android.net.Uri
 import android.util.Log
 import com.hal1cinogen.systembarsmodernizer.BuildConfig
+import com.hal1cinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1cinogen.systembarsmodernizer.tool.ReflectionUtils.findMethod
 import dalvik.system.BaseDexClassLoader
 import dalvik.system.DexFile
-import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
 object XposedPluginLoader {
-    private val sPluginCache: MutableMap<Class<*>, Any> = HashMap()
+    private val sPluginCache: MutableMap<String, Any> = HashMap()
 
     @Throws(Exception::class)
-    fun load(pluginClz: Class<*>, context: Context, lpparam: LoadPackageParam) {
-        var pluginObj: Any? = sPluginCache[pluginClz]
+    fun load(
+        packageName: String,
+        pluginClz: Class<*>,
+        context: Context,
+        appConfig: AppConfig
+    ) {
+        var pluginObj: Any? = sPluginCache[packageName]
         if (pluginObj == null) {
             synchronized(pluginClz) {
-                pluginObj = sPluginCache[pluginClz]
+                pluginObj = sPluginCache[packageName]
                 if (pluginObj == null) {
                     val temp = loadFromLocal(pluginClz)
                     pluginObj = temp
-                    sPluginCache[pluginClz] = temp
+                    sPluginCache[packageName] = temp
                 }
             }
         }
-        pluginObj?.let { callPluginMain(it, context, lpparam) }
+        pluginObj?.let { callPluginMain(it, context, appConfig) }
 
     }
 
@@ -172,13 +177,13 @@ object XposedPluginLoader {
         InstantiationException::class,
         InvocationTargetException::class
     )
-    private fun callPluginMain(pluginObj: Any, context: Context, lpparam: LoadPackageParam) {
+    private fun callPluginMain(pluginObj: Any, context: Context, appConfig: AppConfig) {
         val method = pluginObj.javaClass.getDeclaredMethod(
             "main",
             Context::class.java,
-            LoadPackageParam::class.java
+            AppConfig::class.java
         )
-        method.invoke(pluginObj, context, lpparam)
+        method.invoke(pluginObj, context, appConfig)
     }
 
     private fun forceClassLoaderReloadClasses(

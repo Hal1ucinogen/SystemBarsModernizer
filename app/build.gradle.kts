@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("plugin.serialization") version "1.8.10"
 }
 
 android {
@@ -70,4 +71,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     debugImplementation("androidx.compose.ui:ui-tooling")
     compileOnly ("de.robv.android.xposed:api:82")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("com.crossbowffs.remotepreferences:remotepreferences:0.8")
 }

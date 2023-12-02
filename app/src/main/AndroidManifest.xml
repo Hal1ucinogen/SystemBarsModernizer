@@ -21,19 +21,26 @@
             android:value="Modernize your system bars" />
         <meta-data
             android:name="xposedminversion"
-            android:value="54" />
+            android:value="93" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.SystemBarsModernizer">
+            android:theme="@style/Theme.SystemBarsModernizer"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:authorities="${applicationId}.prefs"
+            android:name=".tool.PreferenceProvider"
+            android:directBootAware="true"
+            android:exported="true"/>
     </application>
 
 </manifest>
