@@ -1,4 +1,4 @@
-package com.hal1cinogen.systembarsmodernizer
+package com.hal1ucinogen.systembarsmodernizer
 
 const val TARGET_PACKAGE_NAME = "com.taobao.taobao"
 

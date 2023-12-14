@@ -1,4 +1,4 @@
-package com.hal1cinogen.systembarsmodernizer.ui.theme
+package com.hal1ucinogen.systembarsmodernizer.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

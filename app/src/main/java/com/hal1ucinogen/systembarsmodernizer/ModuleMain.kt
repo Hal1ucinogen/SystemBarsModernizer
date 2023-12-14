@@ -1,4 +1,4 @@
-package com.hal1cinogen.systembarsmodernizer
+package com.hal1ucinogen.systembarsmodernizer
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -8,8 +8,8 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.core.view.WindowCompat
-import com.hal1cinogen.systembarsmodernizer.bean.AppConfig
-import com.hal1cinogen.systembarsmodernizer.tool.Task
+import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
+import com.hal1ucinogen.systembarsmodernizer.tool.Task
 import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedInterface.AfterHookCallback
 import io.github.libxposed.api.XposedInterface.BeforeHookCallback

@@ -1,4 +1,4 @@
-package com.hal1cinogen.systembarsmodernizer.tool
+package com.hal1ucinogen.systembarsmodernizer.tool
 
 import android.os.Handler
 import android.os.Looper

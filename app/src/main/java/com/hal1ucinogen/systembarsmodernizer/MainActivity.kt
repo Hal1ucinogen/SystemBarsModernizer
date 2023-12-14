@@ -1,4 +1,4 @@
-package com.hal1cinogen.systembarsmodernizer
+package com.hal1ucinogen.systembarsmodernizer
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
-import com.hal1cinogen.systembarsmodernizer.bean.AppConfig
-import com.hal1cinogen.systembarsmodernizer.bean.PageConfig
-import com.hal1cinogen.systembarsmodernizer.databinding.ActivityMainBinding
-import com.hal1cinogen.systembarsmodernizer.ui.theme.SystemBarsModernizerTheme
+import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
+import com.hal1ucinogen.systembarsmodernizer.databinding.ActivityMainBinding
+import com.hal1ucinogen.systembarsmodernizer.ui.theme.SystemBarsModernizerTheme
 import io.github.libxposed.service.XposedService
 import io.github.libxposed.service.XposedServiceHelper
 import kotlinx.serialization.encodeToString
@@ -133,11 +133,11 @@ class MainActivity : ComponentActivity() {
         val checkerMain = PageConfig(edgeToEdge = true)
         val checkerConfig =
             AppConfig(
-                "com.hal1cinogen.sbmchecker",
+                "com.hal1ucinogen.sbmchecker",
                 false,
                 1,
                 mapOf(
-                    "com.hal1cinogen.sbmchecker.MainActivity" to checkerMain,
+                    "com.hal1ucinogen.sbmchecker.MainActivity" to checkerMain,
                 )
             )
         savePref(checkerConfig.packageName, checkerConfig)

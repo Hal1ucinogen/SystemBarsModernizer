@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.hal1cinogen.systembarsmodernizer"
+    namespace = "com.hal1ucinogen.systembarsmodernizer"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.hal1cinogen.systembarsmodernizer"
+        applicationId = "com.hal1ucinogen.systembarsmodernizer"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

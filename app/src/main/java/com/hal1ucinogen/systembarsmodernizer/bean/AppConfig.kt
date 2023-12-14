@@ -1,4 +1,4 @@
-package com.hal1cinogen.systembarsmodernizer.bean
+package com.hal1ucinogen.systembarsmodernizer.bean
 
 import kotlinx.serialization.Serializable
 
