@@ -15,3 +15,4 @@ const val ACTIVITY_WEEX = "com.taobao.weex.WXActivity"// translucent status, bla
 const val ACTIVITY_SEARCH_RESULT = "com.taobao.search.sf.MainSearchResultActivity"
 
 const val METHOD_ON_CREATE = "onCreate"
+const val METHOD_CALL_APPLICATION_ON_CREATE = "callApplicationOnCreate"

@@ -2,39 +2,59 @@ package com.hal1cinogen.systembarsmodernizer
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import com.hal1cinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1cinogen.systembarsmodernizer.bean.PageConfig
-import com.hal1cinogen.systembarsmodernizer.tool.PreferenceProvider
+import com.hal1cinogen.systembarsmodernizer.databinding.ActivityMainBinding
 import com.hal1cinogen.systembarsmodernizer.ui.theme.SystemBarsModernizerTheme
+import io.github.libxposed.service.XposedService
+import io.github.libxposed.service.XposedServiceHelper
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
+
+    private var mService: XposedService? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.binder.text = "Loading"
+        XposedServiceHelper.registerListener(object : XposedServiceHelper.OnServiceListener {
+            override fun onServiceBind(service: XposedService) {
+                mService = service
+                binding.binder.text = "Binder acquired"
+                binding.api.text = "API " + service.apiVersion
+                binding.framework.text = "Framework " + service.frameworkName
+                binding.frameworkVersion.text = "Framework version " + service.frameworkVersion
+                binding.frameworkVersionCode.text =
+                    "Framework version code " + service.frameworkVersionCode
+                binding.scope.text = "Scope: " + service.scope
+                binding.btnSave.setOnClickListener {
+                    savePrefs()
+                }
+            }
+
+            override fun onServiceDied(service: XposedService) {
+            }
+        })
+
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            if (mService == null) {
+                binding.binder.text = "Binder is null"
+            }
+        }, 5000)
+        /*setContent {
             SystemBarsModernizerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -50,53 +70,102 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Greeting("System Bars Modernizer")
                         Spacer(modifier = Modifier.height(24.dp))
-                        Button(onClick = {
-                            kotlin.runCatching {
-                                val packageName = "com.dotamax.app"
-                                val prefName = packageName.replace('.', '_')
-                                Log.d("Naughty", "onCreate: prefName - $prefName")
-                                val pref = PreferenceProvider.get(this@MainActivity)
-                                Log.d("Naughty", "onCreate: pref - $pref")
-                                pref?.edit {
-                                    val mainPage = PageConfig(false, false, Color.WHITE)
-                                    val matchPage = PageConfig(false, false, Color.WHITE)
-                                    val config =
-                                        AppConfig(
-                                            false,
-                                            1,
-                                            mapOf("com.max.app.module.main.MainActivity" to mainPage,
-                                                "com.max.app.module.match.match.MatchActivity" to matchPage,
-                                                "com.max.app.module.me.PlayerMeActivity" to matchPage)
-                                        )
-                                    val json = Json.encodeToString(config)
-                                    Log.d("Naughty", "onCreate: json - $json")
-                                    putString("com.dotamax.app", json)
-
-                                    val jdMain = PageConfig(false, true, Color.WHITE)
-                                    val jdConfig =
-                                        AppConfig(
-                                            false,
-                                            1,
-                                            mapOf("com.jingdong.app.mall.MainFrameActivity" to jdMain)
-                                        )
-
-                                    val jdJson = Json.encodeToString(jdConfig)
-                                    putString("com.jingdong.app.mall", jdJson)
-
-                                }
-
-                                Toast.makeText(this@MainActivity, "Saved", Toast.LENGTH_SHORT)
-                                    .show()
-                            }.onFailure {
-                                it.printStackTrace()
-                                Toast.makeText(this@MainActivity, "Error", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        }) {
+                        Button(onClick = {}) {
                             Text(text = "Save")
                         }
                     }
                 }
+            }
+        }*/
+    }
+
+    private fun savePrefs() {
+        // DOTA MAX
+        val mainPage = PageConfig()
+        val matchPage = PageConfig()
+        val webPage = PageConfig(
+            edgeToEdge = true,
+            windowBackgroundColor = Color.WHITE
+        )
+        val config =
+            AppConfig(
+                "com.dotamax.app",
+                false,
+                1,
+                mapOf(
+                    "com.max.app.module.main.MainActivity" to mainPage,
+                    "com.max.app.module.match.match.MatchActivity" to matchPage,
+                    "com.max.app.module.me.PlayerMeActivity" to matchPage,
+                    "com.max.app.module.webaction.WebActionActivity" to webPage
+                )
+            )
+        savePref(config.packageName, config)
+
+        // 闲鱼
+        val xyMain = PageConfig(edgeToEdge = true)
+        val xyConfig =
+            AppConfig(
+                "com.taobao.idlefish",
+                false,
+                1,
+                mapOf(
+                    "com.taobao.idlefish.maincontainer.activity.MainActivity" to xyMain,
+                )
+            )
+        savePref(xyConfig.packageName, xyConfig)
+
+        // 京东
+        val jdMain = PageConfig(navigationColor = Color.WHITE)
+        val jdSearch = PageConfig(edgeToEdge = true)
+        val jdConfig =
+            AppConfig(
+                "com.jingdong.app.mall",
+                false,
+                1,
+                mapOf(
+                    "com.jingdong.app.mall.MainFrameActivity" to jdMain,
+                    "com.jd.lib.search.view.Activity.SearchActivity" to jdSearch
+                )
+            )
+        savePref(jdConfig.packageName, jdConfig)
+
+        // SBM - Checker
+        val checkerMain = PageConfig(edgeToEdge = true)
+        val checkerConfig =
+            AppConfig(
+                "com.hal1cinogen.sbmchecker",
+                false,
+                1,
+                mapOf(
+                    "com.hal1cinogen.sbmchecker.MainActivity" to checkerMain,
+                )
+            )
+        savePref(checkerConfig.packageName, checkerConfig)
+
+        // 淘宝
+        val tbE2E = PageConfig(edgeToEdge = true)
+        val tbConfig = AppConfig(
+            TARGET_PACKAGE_NAME,
+            false, 1, mapOf(
+                ACTIVITY_SETTINGS to tbE2E,
+                ACTIVITY_ORDER_LIST to tbE2E,
+                ACTIVITY_SHOP to tbE2E,
+                ACTIVITY_GOODS_PAGER to tbE2E
+            )
+        )
+        savePref(tbConfig.packageName, tbConfig)
+    }
+
+    private fun savePref(group: String, config: AppConfig) {
+        mService?.let {
+            try {
+                val prefs = it.getRemotePreferences(group)
+                val json = Json.encodeToString(config)
+                prefs.edit {
+                    putString(group, json)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

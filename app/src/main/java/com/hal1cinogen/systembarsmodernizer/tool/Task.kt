@@ -2,9 +2,7 @@ package com.hal1cinogen.systembarsmodernizer.tool
 
 import android.os.Handler
 import android.os.Looper
-import com.hal1cinogen.systembarsmodernizer.tool.ApplicationUtils.application
-import de.robv.android.xposed.XposedBridge
-import java.util.concurrent.Executors
+import android.util.Log
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
@@ -18,7 +16,7 @@ object Task {
             try {
                 runnable.run()
             } catch (e: Exception) {
-                XposedBridge.log(e)
+                Log.e("Task", "onMain", e)
             }
         }
         if (delay > 0) {
@@ -37,7 +35,7 @@ object Task {
             try {
                 runnable.run()
             } catch (e: Exception) {
-                XposedBridge.log(e)
+                Log.e("Task", "onBackground", e)
             }
         }
         if (delay > 0) {
@@ -45,27 +43,6 @@ object Task {
         } else {
             BackgroundThreadPoolHolder.pool.submit(run)
         }
-    }
-
-    fun onApplicationReady(runnable: Runnable?) {
-        val pool = Executors.newScheduledThreadPool(1)
-        val task: Runnable = object : Runnable {
-            override fun run() {
-                val application = application
-                if (application == null) {
-                    pool.schedule(this, 200, TimeUnit.MILLISECONDS)
-                    return
-                }
-                val looper = Looper.getMainLooper()
-                if (looper == null) {
-                    pool.schedule(this, 200, TimeUnit.MILLISECONDS)
-                    return
-                }
-                val handler = Handler(looper)
-                handler.post(runnable!!)
-            }
-        }
-        pool.submit(task)
     }
 
     private object MainHandlerHolder {

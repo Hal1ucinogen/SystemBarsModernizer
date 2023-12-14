@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SystemBarsModernizer</string>
+    <string name="app_desc">Modernize your system bars</string>
 </resources>
