@@ -5,16 +5,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.ComponentActivity
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
 import com.hal1ucinogen.systembarsmodernizer.databinding.ActivityMainBinding
-import com.hal1ucinogen.systembarsmodernizer.ui.theme.SystemBarsModernizerTheme
 import io.github.libxposed.service.XposedService
 import io.github.libxposed.service.XposedServiceHelper
 import kotlinx.serialization.encodeToString
@@ -54,29 +49,6 @@ class MainActivity : ComponentActivity() {
                 binding.binder.text = "Binder is null"
             }
         }, 5000)
-        /*setContent {
-            SystemBarsModernizerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .statusBarsPadding(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Greeting("System Bars Modernizer")
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Button(onClick = {}) {
-                            Text(text = "Save")
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     private fun savePrefs() {
@@ -168,21 +140,5 @@ class MainActivity : ComponentActivity() {
                 e.printStackTrace()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SystemBarsModernizerTheme {
-        Greeting("Android")
     }
 }
