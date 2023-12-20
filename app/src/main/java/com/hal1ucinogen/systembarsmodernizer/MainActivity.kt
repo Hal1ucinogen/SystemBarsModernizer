@@ -159,7 +159,7 @@ class MainActivity : ComponentActivity() {
     private fun savePref(group: String, config: AppConfig) {
         mService?.let {
             try {
-                val prefs = it.getRemotePreferences(group)
+                val prefs = it.getRemotePreferences(CONFIG_PREF_NAME)
                 val json = Json.encodeToString(config)
                 prefs.edit {
                     putString(group, json)

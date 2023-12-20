@@ -94,7 +94,7 @@ class ModuleMain(base: XposedInterface, param: ModuleLoadedParam) : XposedModule
         if (param.applicationInfo.processName.contains(":")) return
         try {
             val packageName = param.packageName
-            val prefs = getRemotePreferences(packageName)
+            val prefs = getRemotePreferences(CONFIG_PREF_NAME)
             val appConfigStr = prefs.getString(packageName, null)
             if (appConfigStr.isNullOrEmpty()) {
                 log("Remote prefs: app config is null")

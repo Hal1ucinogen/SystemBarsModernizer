@@ -16,3 +16,5 @@ const val ACTIVITY_SEARCH_RESULT = "com.taobao.search.sf.MainSearchResultActivit
 
 const val METHOD_ON_CREATE = "onCreate"
 const val METHOD_CALL_APPLICATION_ON_CREATE = "callApplicationOnCreate"
+
+const val CONFIG_PREF_NAME = "app_configs"
