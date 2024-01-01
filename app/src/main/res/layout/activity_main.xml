@@ -3,14 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:padding="16dp"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/binder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="Binder" />
 
@@ -18,7 +17,6 @@
         android:id="@+id/api"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="API" />
 
@@ -26,7 +24,6 @@
         android:id="@+id/framework"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="Framework" />
 
@@ -34,7 +31,6 @@
         android:id="@+id/framework_version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="Framework version" />
 
@@ -42,7 +38,6 @@
         android:id="@+id/framework_version_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="Framework version code" />
 
@@ -50,7 +45,6 @@
         android:id="@+id/scope"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:textAppearance="?android:textAppearanceLarge"
         tools:text="Scope" />
 

@@ -71,4 +71,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     compileOnly("io.github.libxposed:api:100")
     implementation("io.github.libxposed:service:100-1.0.0")
+    implementation(libs.brvah)
 }
