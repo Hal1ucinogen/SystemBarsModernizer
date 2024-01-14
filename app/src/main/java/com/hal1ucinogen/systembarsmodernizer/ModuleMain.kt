@@ -54,12 +54,21 @@ class ModuleMain(base: XposedInterface, param: ModuleLoadedParam) : XposedModule
             @AfterInvocation
             fun after(callback: AfterHookCallback) {
                 val activity = callback.thisObject as? Activity ?: return
+                val window = activity.window ?: return
                 module.log("Activity onCreate | ${activity.javaClass.name}")
                 val config = module.configMap[activity.packageName] ?: return
+                val activityName = activity.javaClass.name
                 val scope = config.scope
-                val pageConfig = scope[activity.javaClass.name] ?: return
-                module.log("Activity ${activity.javaClass.name} config | $pageConfig")
-                val window = activity.window ?: return
+                var pageConfig = scope[activityName]
+                if (pageConfig == null) {
+                    val general = config.general
+                    if (general == null || activityName in general.exclusive) {
+                        return
+                    } else {
+                        pageConfig = config.general.config
+                    }
+                }
+                module.log("Activity $activityName config | $pageConfig")
                 if (pageConfig.edgeToEdge) {
                     Task.onMain(100) {
                         window.setBackgroundDrawable(ColorDrawable(pageConfig.windowBackgroundColor))

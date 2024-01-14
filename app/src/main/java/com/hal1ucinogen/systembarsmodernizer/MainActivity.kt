@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.GeneralConfig
 import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
 import com.hal1ucinogen.systembarsmodernizer.databinding.ActivityMainBinding
 import io.github.libxposed.service.XposedService
@@ -69,7 +70,8 @@ class MainActivity : ComponentActivity() {
                     "com.max.app.module.match.match.MatchActivity" to matchPage,
                     "com.max.app.module.me.PlayerMeActivity" to matchPage,
                     "com.max.app.module.webaction.WebActionActivity" to webPage
-                )
+                ),
+                GeneralConfig(PageConfig(), listOf("com.max.app.module.discovery.ImageActivity"))
             )
         savePref(config.packageName, config)
 
