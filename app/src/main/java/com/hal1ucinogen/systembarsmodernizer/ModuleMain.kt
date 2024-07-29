@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.app.Instrumentation
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.core.view.WindowCompat
@@ -72,9 +74,12 @@ class ModuleMain(base: XposedInterface, param: ModuleLoadedParam) : XposedModule
                 if (pageConfig.edgeToEdge) {
                     Task.onMain(100) {
                         window.setBackgroundDrawable(ColorDrawable(pageConfig.windowBackgroundColor))
-                        window.statusBarColor = pageConfig.statusColor
-                        window.navigationBarColor = pageConfig.navigationColor
+                        window.statusBarColor = Color.TRANSPARENT
+                        window.navigationBarColor = Color.TRANSPARENT
                         WindowCompat.setDecorFitsSystemWindows(window, false)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                        }
                     }
                 } else {
                     Task.onMain(100) {
