@@ -56,14 +56,20 @@ android {
         }
     }
 }
+configurations.configureEach {
+    exclude("androidx.appcompat", "appcompat")
+}
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation(libs.androidX.core)
+//    implementation(libs.androidX.appCompat)
+    implementation(libs.androidX.fragment)
+    implementation(libs.google.material)
+    implementation(libs.bundles.androidX.lifecycle)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     compileOnly("io.github.libxposed:api:100")
     implementation("io.github.libxposed:service:100-1.0.0")
     implementation(libs.brvah)
+    implementation(libs.bundles.rikkax)
+    implementation(libs.timber)
 }

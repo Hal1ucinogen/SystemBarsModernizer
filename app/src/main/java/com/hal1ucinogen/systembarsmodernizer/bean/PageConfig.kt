@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class PageConfig(
     val edgeToEdge: Boolean = false,
     val clearTranslucent: Boolean = false,
-    @ColorInt val windowBackgroundColor: Int = Color.WHITE,
+    @ColorInt val windowBackgroundColor: Int? = null,
     @ColorInt val statusColor: Int = Color.TRANSPARENT,
     @ColorInt val navigationColor: Int = Color.TRANSPARENT
 )

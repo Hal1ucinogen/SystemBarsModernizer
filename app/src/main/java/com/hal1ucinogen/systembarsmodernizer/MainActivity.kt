@@ -1,146 +1,123 @@
 package com.hal1ucinogen.systembarsmodernizer
 
-import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import androidx.activity.ComponentActivity
-import androidx.core.content.edit
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
-import com.hal1ucinogen.systembarsmodernizer.bean.GeneralConfig
-import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.hal1ucinogen.systembarsmodernizer.databinding.ActivityMainBinding
-import io.github.libxposed.service.XposedService
-import io.github.libxposed.service.XposedServiceHelper
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.hal1ucinogen.systembarsmodernizer.feature.applist.ui.AppListFragment
+import com.hal1ucinogen.systembarsmodernizer.feature.overview.ui.OverviewFragment
+import com.hal1ucinogen.systembarsmodernizer.feature.settings.ui.SettingsFragment
+import com.hal1ucinogen.systembarsmodernizer.ui.base.BaseActivity
+import com.hal1ucinogen.systembarsmodernizer.util.addBackStateHandler
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
-    private var mService: XposedService? = null
+    private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.binder.text = "Loading"
-        XposedServiceHelper.registerListener(object : XposedServiceHelper.OnServiceListener {
-            override fun onServiceBind(service: XposedService) {
-                mService = service
-                binding.binder.text = "Binder acquired"
-                binding.api.text = "API " + service.apiVersion
-                binding.framework.text = "Framework " + service.frameworkName
-                binding.frameworkVersion.text = "Framework version " + service.frameworkVersion
-                binding.frameworkVersionCode.text =
-                    "Framework version code " + service.frameworkVersionCode
-                binding.scope.text = "Scope: " + service.scope
-                binding.btnSave.setOnClickListener {
-                    savePrefs()
-                }
-            }
-
-            override fun onServiceDied(service: XposedService) {
-            }
-        })
-
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-            if (mService == null) {
-                binding.binder.text = "Binder is null"
-            }
-        }, 5000)
+        initViews()
     }
 
-    private fun savePrefs() {
-        // DOTA MAX
-        val mainPage = PageConfig()
-        val matchPage = PageConfig()
-        val webPage = PageConfig(
-            edgeToEdge = true,
-            windowBackgroundColor = Color.WHITE
+    private fun initViews() {
+        val navView = binding.navView
+        setSupportActionBar(binding.toolbar)
+        binding.container.bringChildToFront(binding.appbar)
+        binding.viewpager.run {
+            adapter = object : FragmentStateAdapter(this@MainActivity) {
+                override fun getItemCount(): Int = 3
+                override fun createFragment(position: Int): Fragment {
+                    return when (position) {
+                        0 -> OverviewFragment()
+                        1 -> AppListFragment()
+                        else -> SettingsFragment()
+                    }
+                }
+            }
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    navView.menu.getItem(position).isChecked = true
+                }
+            })
+            isUserInputEnabled = false
+            offscreenPageLimit = 2
+            fixViewPager2Insets(this)
+
+            navView.run {
+                if (this is BottomNavigationView) {
+                    (layoutParams as CoordinatorLayout.LayoutParams).behavior = navViewBehavior
+                }
+                requestLayout()
+                setOnItemSelectedListener {
+                    fun performClickNavItem(index: Int) {
+                        if (binding.viewpager.currentItem != index) {
+                            if (!binding.viewpager.isFakeDragging) {
+                                binding.viewpager.setCurrentItem(index, true)
+                            }
+                        } else {
+                            val clickFlag =
+                                binding.viewpager.getTag(R.id.viewpager_tab_click) as? Boolean
+                                    ?: false
+                            if (!clickFlag) {
+                                binding.viewpager.setTag(R.id.viewpager_tab_click, true)
+                                lifecycleScope.launch {
+                                    delay(200L)
+                                    binding.viewpager.setTag(R.id.viewpager_tab_click, false)
+                                }
+                            } else {
+                                // todo refresh child
+                            }
+                        }
+                    }
+                    when (it.itemId) {
+                        R.id.navigation_overview -> performClickNavItem(0)
+                        R.id.navigation_app_list -> performClickNavItem(1)
+                        R.id.navigation_settings -> performClickNavItem(2)
+                    }
+                    true
+                }
+                setOnClickListener { }
+                if (this is BottomNavigationView) {
+                    fixBottomNavInsets(this)
+                }
+            }
+        }
+
+        onBackPressedDispatcher.addBackStateHandler(
+            lifecycleOwner = this,
+            enableState = { binding.toolbar.hasExpandedActionView() },
+            handler = { binding.toolbar.collapseActionView() }
         )
-        val config =
-            AppConfig(
-                "com.dotamax.app",
-                false,
-                1,
-                mapOf(
-                    "com.max.app.module.main.MainActivity" to mainPage,
-                    "com.max.app.module.match.match.MatchActivity" to matchPage,
-                    "com.max.app.module.me.PlayerMeActivity" to matchPage,
-                    "com.max.app.module.webaction.WebActionActivity" to webPage
-                ),
-                GeneralConfig(PageConfig(), listOf("com.max.app.module.discovery.ImageActivity"))
-            )
-        savePref(config.packageName, config)
-
-        // 闲鱼
-        val xyMain = PageConfig(edgeToEdge = true)
-        val xyConfig =
-            AppConfig(
-                "com.taobao.idlefish",
-                false,
-                1,
-                mapOf(
-                    "com.taobao.idlefish.maincontainer.activity.MainActivity" to xyMain,
-                )
-            )
-        savePref(xyConfig.packageName, xyConfig)
-
-        // 京东
-        val jdMain = PageConfig(navigationColor = Color.WHITE)
-        val jdSearch = PageConfig(edgeToEdge = true)
-        val jdConfig =
-            AppConfig(
-                "com.jingdong.app.mall",
-                false,
-                1,
-                mapOf(
-                    "com.jingdong.app.mall.MainFrameActivity" to jdMain,
-                    "com.jd.lib.search.view.Activity.SearchActivity" to jdSearch
-                )
-            )
-        savePref(jdConfig.packageName, jdConfig)
-
-        // SBM - Checker
-        val checkerMain = PageConfig(edgeToEdge = true)
-        val checkerConfig =
-            AppConfig(
-                "com.hal1ucinogen.sbmchecker",
-                false,
-                1,
-                mapOf(
-                    "com.hal1ucinogen.sbmchecker.MainActivity" to checkerMain,
-                )
-            )
-        savePref(checkerConfig.packageName, checkerConfig)
-
-        // 淘宝
-        val tbE2E = PageConfig(edgeToEdge = true)
-        val tbConfig = AppConfig(
-            TARGET_PACKAGE_NAME,
-            false, 1, mapOf(
-                ACTIVITY_SETTINGS to tbE2E,
-                ACTIVITY_ORDER_LIST to tbE2E,
-                ACTIVITY_SHOP to tbE2E,
-                ACTIVITY_GOODS_PAGER to tbE2E
-            )
-        )
-        savePref(tbConfig.packageName, tbConfig)
     }
 
-    private fun savePref(group: String, config: AppConfig) {
-        mService?.let {
-            try {
-                val prefs = it.getRemotePreferences(CONFIG_PREF_NAME)
-                val json = Json.encodeToString(config)
-                prefs.edit {
-                    putString(group, json)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    private fun fixViewPager2Insets(view: ViewPager2) {
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+            /* Do nothing */
+            windowInsets
+        }
+    }
+
+    private fun fixBottomNavInsets(view: BottomNavigationView) {
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+            val navBarInsets = ViewCompat.getRootWindowInsets(view)!!
+                .getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = navBarInsets.bottom)
+            windowInsets
         }
     }
 }

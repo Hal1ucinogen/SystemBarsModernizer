@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">SystemBarsModernizer</string>
     <string name="app_desc">Modernize your system bars</string>
+
+    <string name="title_app_list">Apps</string>
+    <string name="title_overview">Overview</string>
+    <string name="title_settings">Settings</string>
 </resources>

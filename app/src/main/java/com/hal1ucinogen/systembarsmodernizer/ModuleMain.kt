@@ -72,18 +72,28 @@ class ModuleMain(base: XposedInterface, param: ModuleLoadedParam) : XposedModule
                 }
                 module.log("Activity $activityName config | $pageConfig")
                 if (pageConfig.edgeToEdge) {
-                    Task.onMain(100) {
-                        window.setBackgroundDrawable(ColorDrawable(pageConfig.windowBackgroundColor))
-                        window.statusBarColor = Color.TRANSPARENT
-                        window.navigationBarColor = Color.TRANSPARENT
-                        WindowCompat.setDecorFitsSystemWindows(window, false)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-                        }
+                    pageConfig.windowBackgroundColor?.let {
+                        window.setBackgroundDrawable(
+                            ColorDrawable(it)
+                        )
+                    }
+                    window.statusBarColor = Color.TRANSPARENT
+                    window.navigationBarColor = Color.TRANSPARENT
+                    WindowCompat.setDecorFitsSystemWindows(window, false)
+                    window.isStatusBarContrastEnforced = false
+                    window.isNavigationBarContrastEnforced = false
+//                    activity.enableEdgeToEdgeCompat()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        window.attributes.layoutInDisplayCutoutMode =
+                            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
                     }
                 } else {
                     Task.onMain(100) {
-                        window.setBackgroundDrawable(ColorDrawable(pageConfig.windowBackgroundColor))
+                        pageConfig.windowBackgroundColor?.let {
+                            window.setBackgroundDrawable(
+                                ColorDrawable(it)
+                            )
+                        }
                         if (pageConfig.clearTranslucent) {
                             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
