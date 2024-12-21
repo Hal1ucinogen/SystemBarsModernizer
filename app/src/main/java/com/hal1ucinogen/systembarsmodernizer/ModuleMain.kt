@@ -8,10 +8,21 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.view.WindowCompat
+import androidx.core.view.children
+import androidx.core.view.marginBottom
+import androidx.core.view.marginEnd
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1ucinogen.systembarsmodernizer.tool.Task
+import com.hal1ucinogen.systembarsmodernizer.util.getNavigationHeight
+import com.hal1ucinogen.systembarsmodernizer.util.getStatusHeight
 import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedInterface.AfterHookCallback
 import io.github.libxposed.api.XposedInterface.BeforeHookCallback
@@ -78,14 +89,69 @@ class ModuleMain(base: XposedInterface, param: ModuleLoadedParam) : XposedModule
                         )
                     }
                     window.statusBarColor = Color.TRANSPARENT
-                    window.navigationBarColor = Color.TRANSPARENT
-                    WindowCompat.setDecorFitsSystemWindows(window, false)
                     window.isStatusBarContrastEnforced = false
-                    window.isNavigationBarContrastEnforced = false
+                    window.decorView.post {
+                        window.navigationBarColor = Color.TRANSPARENT
+                        window.isNavigationBarContrastEnforced = false
+                    }
+                    WindowCompat.setDecorFitsSystemWindows(window, false)
 //                    activity.enableEdgeToEdgeCompat()
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         window.attributes.layoutInDisplayCutoutMode =
                             WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                    }
+                    // TODO There is a inset change issue. Try to useViewCompat.setOnApplyWindowInsetsListener instead
+                    pageConfig.extraActions.forEach { extraAction ->
+                        module.log("In ExtraAction | $extraAction")
+                        Task.onMain(100) {
+                            val resources = window.decorView.resources
+                            val id = resources.getIdentifier(
+                                extraAction.viewId,
+                                "id",
+                                activity.packageName
+                            )
+                            val inset = if (extraAction.useSystemInsets) {
+                                if (extraAction.isTop) {
+                                    activity.getStatusHeight()
+                                } else {
+                                    activity.getNavigationHeight()
+                                }
+                            } else {
+                                extraAction.customInset
+                            }
+                            val target = if (extraAction.isGroup) {
+                                val group = activity.findViewById<ViewGroup>(id)
+                                if (extraAction.self) {
+                                    group
+                                } else {
+                                    group.children.elementAtOrNull(extraAction.childIndex)
+                                }
+                            } else {
+                                activity.findViewById<View>(id)
+                            } ?: return@onMain
+                            module.log("Find Target - $target")
+                            module.log("Target Padding - ${target.paddingTop}|${target.paddingBottom}|${target.paddingStart}|${target.paddingEnd}")
+                            module.log("Target Margin - ${target.marginTop}|${target.marginBottom}|${target.marginStart}|${target.marginEnd}")
+                            if (extraAction.isPadding) {
+                                if (extraAction.isTop) {
+                                    target.updatePadding(top = inset)
+                                } else {
+                                    target.updatePadding(bottom = inset)
+                                }
+                            } else {
+                                if (extraAction.isTop) {
+                                    target.updateLayoutParams<ViewGroup.LayoutParams> {
+                                        (this as ViewGroup.MarginLayoutParams).topMargin =
+                                            inset
+                                    }
+                                } else {
+                                    target.updateLayoutParams<ViewGroup.LayoutParams> {
+                                        (this as ViewGroup.MarginLayoutParams).bottomMargin =
+                                            inset
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else {
                     Task.onMain(100) {

@@ -6,6 +6,7 @@ import android.os.Looper
 import androidx.core.content.edit
 import com.hal1ucinogen.systembarsmodernizer.CONFIG_PREF_NAME
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
 import com.hal1ucinogen.systembarsmodernizer.bean.GeneralConfig
 import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
 import com.hal1ucinogen.systembarsmodernizer.databinding.FragmentOverviewBinding
@@ -53,8 +54,8 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
 
     private fun savePrefs() {
         // DOTA MAX
-        val mainPage = PageConfig(edgeToEdge = true, windowBackgroundColor = Color.WHITE)
-        val matchPage = PageConfig(edgeToEdge = true, windowBackgroundColor = Color.WHITE)
+        val mainPage = PageConfig(edgeToEdge = false, windowBackgroundColor = Color.WHITE)
+        val matchPage = PageConfig(edgeToEdge = false, windowBackgroundColor = Color.WHITE)
         val webPage = PageConfig(
             edgeToEdge = true,
             windowBackgroundColor = Color.WHITE
@@ -103,7 +104,10 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
                     "com.jd.lib.evaluatecenter.view.activity.DetailPreviewActivity" to jdE2E,
                     "com.jd.lib.productdetailmini.PdMiniActivity" to jdE2E
                 ),
-                general = GeneralConfig(jdMain, exclusive = listOf("com.jd.lib.videoimmersionstyleb.view.activity.VideoImmersionStyleBActivity"))
+                general = GeneralConfig(
+                    jdMain,
+                    exclusive = listOf("com.jd.lib.videoimmersionstyleb.view.activity.VideoImmersionStyleBActivity")
+                )
             )
         savePref(jdConfig.packageName, jdConfig)
 
@@ -159,10 +163,30 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
                 "me.ele.muise.page.WeexPageActivity" to eleGeneralConfig,
                 "me.ele.orderdetail.ui.lmagex.WMOrderDetailActivity" to eleGeneralConfig,
                 "me.ele.newretail.emagex.activity.EMagexOrderDetailActivity" to eleGeneralConfig,
-                "com.alibaba.triver.container.TriverMainActivity" to eleGeneralConfig
+                "com.alibaba.triver.container.TriverMainActivity" to eleGeneralConfig,
+                "me.ele.android.emagex.container.EMagexActivity" to eleGeneralConfig,
+                "me.ele.component.webcontainer.view.AppUCWebActivity" to eleGeneralConfig.copy(
+                    extraActions = listOf(
+                        ExtraAction("comp_uc_container", true, false, true, false, 0, false, 0)
+                    )
+                )
             )
         )
         savePref(eleConfig.packageName, eleConfig)
+
+        val unionPayPageConfig = PageConfig(edgeToEdge = true)
+        val unionPagConfig = AppConfig(
+            "com.unionpay",
+            1,
+            mapOf(
+                "com.unionpay.activity.message.UPActivityMesssage" to unionPayPageConfig,
+//                "com.unionpay.liteapp.app.UPLiteAppActivity1" to unionPayPageConfig,// Not work
+//                "com.unionpay.liteapp.app.UPLiteAppActivity2" to unionPayPageConfig,// Not work
+//                "com.unionpay.cordova.UPActivityCordovaWeb" to unionPayPageConfig,// Not work
+                "com.unionpay.activity.react.UPActivityReactNative" to unionPayPageConfig,
+            )
+        )
+        savePref(unionPagConfig.packageName, unionPagConfig)
     }
 
     private fun savePref(group: String, config: AppConfig) {
