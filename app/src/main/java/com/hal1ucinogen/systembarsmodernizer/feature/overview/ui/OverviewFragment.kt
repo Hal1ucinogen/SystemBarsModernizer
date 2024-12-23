@@ -142,16 +142,33 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
         savePref(dlConfig.packageName, dlConfig)
 
         // DouBan
-        /*        val dlGeneral = PageConfig(edgeToEdge = true)
-                val dbMain = PageConfig()
-                val dbE2E = PageConfig(edgeToEdge = true)
-                val dbConfig = AppConfig(
-                    "com.douban.frodo", false, 1, mapOf(
-                        "com.douban.frodo.MainActivity" to dbMain,
-                        "com.douban.frodo.baseproject.image.ImageActivity" to dbE2E
-                    ), general = GeneralConfig(dlGeneral)
+        val dlGeneral = PageConfig(edgeToEdge = true)
+        val dbImageWithActionConfig =
+        PageConfig(
+            edgeToEdge = true,
+            extraActions = listOf(
+                ExtraAction(/*"social_bar"*/"social_action_bar", true, false, false, true, self = true)
+            )
+        )
+
+        val dbConfig = AppConfig(
+            "com.douban.frodo",
+            1,
+            mapOf(
+                "com.douban.frodo.baseproject.image.SociableImageActivity" to dbImageWithActionConfig, // 带按钮的图片页
+            ),
+            general = GeneralConfig(
+                dlGeneral,
+                exclusive = listOf(
+                    "com.douban.frodo.MainActivity",// 主页
+                    "com.douban.frodo.subject.structure.activity.MovieActivity", // 电影详情页
+                    "com.douban.frodo.chat.activity.ChatActivity", // 聊天对话页
+                    "com.douban.frodo.subject.activity.ReviewActivity", // 剧评详情页
+                    "com.douban.frodo.subject.activity.SubjectWishManageTabActivity"
                 )
-                savePref(dbConfig.packageName, dbConfig)*/
+            )
+        )
+        savePref(dbConfig.packageName, dbConfig)
 
         // 饿了么
         val eleGeneralConfig = PageConfig(edgeToEdge = true)
@@ -174,6 +191,7 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
         )
         savePref(eleConfig.packageName, eleConfig)
 
+        // UnionPay
         val unionPayPageConfig = PageConfig(edgeToEdge = true)
         val unionPagConfig = AppConfig(
             "com.unionpay",
@@ -187,6 +205,17 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
             )
         )
         savePref(unionPagConfig.packageName, unionPagConfig)
+
+        // Bili
+        val biliPageConfig = PageConfig(edgeToEdge = true)
+        val biliConfig = AppConfig(
+            "com.bilibili.app.in",
+            1,
+            mapOf(
+                "tv.danmaku.bili.ui.webview.MWebActivity" to biliPageConfig
+            )
+        )
+        savePref(biliConfig.packageName, biliConfig)
     }
 
     private fun savePref(group: String, config: AppConfig) {
