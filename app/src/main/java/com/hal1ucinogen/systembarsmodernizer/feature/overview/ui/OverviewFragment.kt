@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import androidx.core.content.edit
+import com.hal1ucinogen.systembarsmodernizer.COLOR_INT_UI_MODE_NIGHT
 import com.hal1ucinogen.systembarsmodernizer.CONFIG_PREF_NAME
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
@@ -71,7 +72,7 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
                     "com.max.app.module.webaction.WebActionActivity" to webPage
                 ),
                 GeneralConfig(
-                    PageConfig(edgeToEdge = true),
+                    PageConfig(edgeToEdge = false, windowBackgroundColor = Color.WHITE),
                     listOf("com.max.app.module.discovery.ImageActivity")
                 )
             )
@@ -128,26 +129,86 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
         val tbConfig = AppConfig(
             "com.taobao.taobao",
             1, mapOf(
-                "com.taobao.mytaobao.newsetting.NewTaobaoSettingActivity" to tbE2E,
+                "com.taobao.mytaobao.newsetting.dx.DxSettingCommonActivity" to tbE2E,
                 "com.taobao.android.order.bundle.TBOrderListActivity" to tbE2E,
                 "com.alibaba.triver.triver_shop.newShop.ShopActivity" to tbE2E,
-                "com.taobao.android.detail2.core.framework.NewDetailActivity" to tbE2E
+                "com.taobao.android.detail2.core.framework.NewDetailActivity" to tbE2E,
+                "com.taobao.search.sf.MainSearchResultActivity" to PageConfig(windowBackgroundColor = Color.WHITE)
             )
         )
         savePref(tbConfig.packageName, tbConfig)
+
+        val mmE2E = PageConfig(edgeToEdge = true)
+        val mmConfig = AppConfig(
+            "com.tencent.mm",
+            1, mapOf(
+//                "com.tencent.mm.plugin.sns.ui.improve.ImproveSnsTimelineUI" to mmE2E,// 朋友圈
+                "com.tencent.mm.plugin.sns.ui.SnsUserUI" to mmE2E,// 我的朋友圈
+                "com.tencent.mm.plugin.webview.ui.tools.MMWebViewUI" to mmE2E,// 网页
+                "com.tencent.mm.plugin.subapp.ui.gallery.GestureGalleryUI" to mmE2E,// 网页图片预览
+                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI00" to mmE2E,// 小程序
+                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI01" to mmE2E,
+                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI02" to mmE2E,
+                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI03" to mmE2E,
+                "com.tencent.mm.plugin.appbrand.ui.AppBrandUIMoveTaskToBackStubUI0" to mmE2E// 小程序转场
+            )
+        )
+        savePref(mmConfig.packageName, mmConfig)
 
         // 电笠
         val dlE2E = PageConfig(edgeToEdge = true)
         val dlConfig = AppConfig("media.dl", 1, emptyMap(), general = GeneralConfig(dlE2E))
         savePref(dlConfig.packageName, dlConfig)
 
+        // 小黑盒
+        val bbGeneral = PageConfig(edgeToEdge = true)
+        val bbConfig = AppConfig(
+            "com.max.xiaoheihe", 1,
+            mapOf(
+                "com.max.xiaoheihe.MainActivity" to PageConfig(
+                    edgeToEdge = false,
+                    windowBackgroundColor = COLOR_INT_UI_MODE_NIGHT,
+                    uiModeWBC = Pair(Color.WHITE, Color.parseColor("#111111"))
+                ),
+                "com.max.xiaoheihe.module.bbs.ChannelsDetailActivity" to bbGeneral,
+                "com.max.xiaoheihe.module.webview.WebActionActivity" to bbGeneral,
+                // view is right but setting padding isn't work
+/*                "com.max.xiaoheihe.module.miniprogram.MiniProgramHostActivity" to bbGeneral.copy(windowBackgroundColor = Color.CYAN,
+                    extraActions = listOf(
+                        ExtraAction("vg_webview_container", false, false, true, false, 0,true)
+                    )
+                )*/
+            ),
+        )
+        savePref(bbConfig.packageName, bbConfig)
+
         // DouBan
-        val dlGeneral = PageConfig(edgeToEdge = true)
+        val dbE2E = PageConfig(edgeToEdge = true)
         val dbImageWithActionConfig =
-        PageConfig(
+            PageConfig(
+                edgeToEdge = true,
+                extraActions = listOf(
+                    ExtraAction(/*"social_bar"*/"social_action_bar",
+                        true,
+                        false,
+                        false,
+                        true,
+                        self = true
+                    )
+                )
+            )
+        val dbWebConfig = PageConfig(
             edgeToEdge = true,
             extraActions = listOf(
-                ExtraAction(/*"social_bar"*/"social_action_bar", true, false, false, true, self = true)
+                ExtraAction(
+                    "base_ui_actionbar_layout",
+                    true,
+                    true,
+                    false,
+                    false,
+                    0,
+                    true
+                )
             )
         )
 
@@ -155,18 +216,21 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
             "com.douban.frodo",
             1,
             mapOf(
+                "com.douban.frodo.baseproject.image.ImageActivity" to dbE2E,// 普通图片页
                 "com.douban.frodo.baseproject.image.SociableImageActivity" to dbImageWithActionConfig, // 带按钮的图片页
+                "com.douban.frodo.profile.activity.NewUserProfileActivity" to dbE2E
             ),
-            general = GeneralConfig(
-                dlGeneral,
+            /*general = GeneralConfig(
+                dlE2E,
                 exclusive = listOf(
                     "com.douban.frodo.MainActivity",// 主页
                     "com.douban.frodo.subject.structure.activity.MovieActivity", // 电影详情页
                     "com.douban.frodo.chat.activity.ChatActivity", // 聊天对话页
                     "com.douban.frodo.subject.activity.ReviewActivity", // 剧评详情页
-                    "com.douban.frodo.subject.activity.SubjectWishManageTabActivity"
+                    "com.douban.frodo.subject.activity.SubjectWishManageTabActivity",
+                    "com.douban.frodo.baseproject.activity.WebActivity"
                 )
-            )
+            )*/
         )
         savePref(dbConfig.packageName, dbConfig)
 
@@ -181,7 +245,6 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
                 "me.ele.orderdetail.ui.lmagex.WMOrderDetailActivity" to eleGeneralConfig,
                 "me.ele.newretail.emagex.activity.EMagexOrderDetailActivity" to eleGeneralConfig,
                 "com.alibaba.triver.container.TriverMainActivity" to eleGeneralConfig,
-                "me.ele.android.emagex.container.EMagexActivity" to eleGeneralConfig,
                 "me.ele.component.webcontainer.view.AppUCWebActivity" to eleGeneralConfig.copy(
                     extraActions = listOf(
                         ExtraAction("comp_uc_container", true, false, true, false, 0, false, 0)

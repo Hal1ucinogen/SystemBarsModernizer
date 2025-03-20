@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.app.Instrumentation
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -156,9 +157,20 @@ class ModuleMain(base: XposedInterface, param: ModuleLoadedParam) : XposedModule
                 } else {
                     Task.onMain(100) {
                         pageConfig.windowBackgroundColor?.let {
-                            window.setBackgroundDrawable(
-                                ColorDrawable(it)
-                            )
+                            if (it == COLOR_INT_UI_MODE_NIGHT) {
+                                val currentNightMode =
+                                    activity.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                                val color = when (currentNightMode) {
+                                    Configuration.UI_MODE_NIGHT_NO -> pageConfig.uiModeWBC.first// Night mode is not active, we're using the light theme.
+                                    Configuration.UI_MODE_NIGHT_YES -> pageConfig.uiModeWBC.second // Night mode is active, we're using dark theme.
+                                    else -> pageConfig.uiModeWBC.second
+                                }
+                                window.setBackgroundDrawable(ColorDrawable(color))
+                            } else {
+                                window.setBackgroundDrawable(
+                                    ColorDrawable(it)
+                                )
+                            }
                         }
                         if (pageConfig.clearTranslucent) {
                             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)

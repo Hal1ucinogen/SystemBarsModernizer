@@ -11,5 +11,6 @@ data class PageConfig(
     @ColorInt val windowBackgroundColor: Int? = null,
     @ColorInt val statusColor: Int = Color.TRANSPARENT,
     @ColorInt val navigationColor: Int = Color.TRANSPARENT,
-    val extraActions: List<ExtraAction> = emptyList()
+    val extraActions: List<ExtraAction> = emptyList(),
+    val uiModeWBC: Pair<Int, Int> = Pair(Color.TRANSPARENT, Color.TRANSPARENT)
 )
