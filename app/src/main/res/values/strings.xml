@@ -5,4 +5,6 @@
     <string name="title_app_list">Apps</string>
     <string name="title_overview">Overview</string>
     <string name="title_settings">Settings</string>
+
+    <string name="empty_list">Empty list</string>
 </resources>

@@ -1,17 +1,19 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.kotlin.android)
     kotlin("plugin.serialization") version "1.8.10"
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.hal1ucinogen.systembarsmodernizer"
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.hal1ucinogen.systembarsmodernizer"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -65,11 +67,16 @@ dependencies {
 //    implementation(libs.androidX.appCompat)
     implementation(libs.androidX.fragment)
     implementation(libs.google.material)
+    implementation(libs.coil)
     implementation(libs.bundles.androidX.lifecycle)
+    implementation(libs.bundles.androidX.room)
+    ksp(libs.androidX.room.compiler)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    compileOnly("io.github.libxposed:api:100")
-    implementation("io.github.libxposed:service:100-1.0.0")
+    compileOnly("io.github.libxposed:api:102.0.0")
+    implementation("io.github.libxposed:service:102.0.0")
     implementation(libs.brvah)
     implementation(libs.bundles.rikkax)
     implementation(libs.timber)
+    implementation(libs.fastScroll)
+    implementation(libs.bundles.zhaobozhen)
 }
