@@ -1,11 +1,11 @@
 package com.hal1ucinogen.systembarsmodernizer.feature.overview.ui
 
 import android.graphics.Color
-import android.os.Handler
-import android.os.Looper
+import android.widget.Toast
 import androidx.core.content.edit
 import com.hal1ucinogen.systembarsmodernizer.COLOR_INT_UI_MODE_NIGHT
 import com.hal1ucinogen.systembarsmodernizer.CONFIG_PREF_NAME
+import com.hal1ucinogen.systembarsmodernizer.SBMApp
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
 import com.hal1ucinogen.systembarsmodernizer.bean.GeneralConfig
@@ -14,20 +14,58 @@ import com.hal1ucinogen.systembarsmodernizer.databinding.FragmentOverviewBinding
 import com.hal1ucinogen.systembarsmodernizer.ui.base.BaseActivity
 import com.hal1ucinogen.systembarsmodernizer.ui.base.BaseFragment
 import io.github.libxposed.service.XposedService
-import io.github.libxposed.service.XposedServiceHelper
+import io.github.libxposed.service.XposedService.OnScopeEventListener
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
+class OverviewFragment : BaseFragment<FragmentOverviewBinding>(), SBMApp.ServiceStateListener {
 
     private var mService: XposedService? = null
+    private val mCallback = object : OnScopeEventListener {
+        override fun onScopeRequestApproved(approved: List<String>) {
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    this@OverviewFragment.requireActivity(),
+                    "onScopeRequestApproved: $approved",
+                    Toast.LENGTH_SHORT
+                ).show()
+                binding.scope.text = "Scope: " + mService?.scope
+            }
+        }
+
+        override fun onScopeRequestFailed(message: String) {
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    this@OverviewFragment.requireActivity(),
+                    "onScopeRequestFailed: $message",
+                    Toast.LENGTH_SHORT
+                ).show()
+                binding.scope.text = "Scope: " + mService?.scope
+            }
+        }
+    }
 
     override fun init() {
         val context = (context as? BaseActivity<*>) ?: return
         binding.binder.text = "Loading"
-        XposedServiceHelper.registerListener(object : XposedServiceHelper.OnServiceListener {
-            override fun onServiceBind(service: XposedService) {
-                mService = service
+    }
+
+    override fun onStart() {
+        super.onStart()
+        SBMApp.addServiceStateListener(this, true)
+    }
+
+    override fun onStop() {
+        SBMApp.removeServiceStateListener(this)
+        super.onStop()
+    }
+
+    override fun onServiceStateChanged(service: XposedService?) {
+        mService = service
+        activity?.runOnUiThread {
+            if (service == null) {
+                binding.binder.text = "Binder is null"
+            } else {
                 binding.binder.text = "Binder acquired"
                 binding.api.text = "API " + service.apiVersion
                 binding.framework.text = "Framework " + service.frameworkName
@@ -39,44 +77,20 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
                     savePrefs()
                 }
             }
+        }
 
-            override fun onServiceDied(service: XposedService) {
-                mService = null
-            }
-        })
-
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed({
-            if (mService == null) {
-                binding.binder.text = "Binder is null"
-            }
-        }, 5000)
     }
 
     private fun savePrefs() {
-        // DOTA MAX
-        val mainPage = PageConfig(edgeToEdge = false, windowBackgroundColor = Color.WHITE)
-        val matchPage = PageConfig(edgeToEdge = false, windowBackgroundColor = Color.WHITE)
-        val webPage = PageConfig(
-            edgeToEdge = true,
-            windowBackgroundColor = Color.WHITE
-        )
-        val config =
+        // Spotify
+        val spPlay = PageConfig(edgeToEdge = false, clearTranslucent = true)
+        val spConfig =
             AppConfig(
-                "com.dotamax.app",
+                "com.spotify.music",
                 1,
-                mapOf(
-                    "com.max.app.module.main.MainActivity" to mainPage,
-                    "com.max.app.module.match.match.MatchActivity" to matchPage,
-                    "com.max.app.module.me.PlayerMeActivity" to matchPage,
-                    "com.max.app.module.webaction.WebActionActivity" to webPage
-                ),
-                GeneralConfig(
-                    PageConfig(edgeToEdge = false, windowBackgroundColor = Color.WHITE),
-                    listOf("com.max.app.module.discovery.ImageActivity")
-                )
+                mapOf("com.spotify.nowplaying.musicinstallation.NowPlayingActivity" to spPlay)
             )
-        savePref(config.packageName, config)
+        savePref(spConfig.packageName, spConfig)
 
         // 闲鱼
         val xyMain = PageConfig(edgeToEdge = false)
@@ -92,22 +106,20 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
         savePref(xyConfig.packageName, xyConfig)
 
         // 京东
-        val jdMain = PageConfig(navigationColor = Color.WHITE)
         val jdE2E = PageConfig(edgeToEdge = true)
         val jdConfig =
             AppConfig(
                 "com.jingdong.app.mall",
                 1,
-                mapOf(
-                    "com.jd.lib.ordercenter.mygoodsorderlist.view.activity.MyOrderListActivity" to jdE2E,
-                    "com.jd.lib.search.view.Activity.SearchActivity" to jdE2E,
-                    "com.jd.lib.productdetail.mainimage.bigimage.PdBigImageActivity" to jdE2E,
-                    "com.jd.lib.evaluatecenter.view.activity.DetailPreviewActivity" to jdE2E,
-                    "com.jd.lib.productdetailmini.PdMiniActivity" to jdE2E
-                ),
+                mapOf(),
                 general = GeneralConfig(
-                    jdMain,
-                    exclusive = listOf("com.jd.lib.videoimmersionstyleb.view.activity.VideoImmersionStyleBActivity")
+                    jdE2E,
+                    exclusive = listOf(
+                        "com.jingdong.app.mall.MainFrameActivity",
+                        "com.jd.lib.settlement.fillorder.activity.PopupNewFillOrderActivity",
+                        "com.jd.lib.productdetail.ProductDetailPopActivity",
+                        "com.jd.lib.productdetail.ProductDetailActivity"
+                    )
                 )
             )
         savePref(jdConfig.packageName, jdConfig)
@@ -129,31 +141,15 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
         val tbConfig = AppConfig(
             "com.taobao.taobao",
             1, mapOf(
-                "com.taobao.mytaobao.newsetting.dx.DxSettingCommonActivity" to tbE2E,
-                "com.taobao.android.order.bundle.TBOrderListActivity" to tbE2E,
-                "com.alibaba.triver.triver_shop.newShop.ShopActivity" to tbE2E,
-                "com.taobao.android.detail2.core.framework.NewDetailActivity" to tbE2E,
-                "com.taobao.search.sf.MainSearchResultActivity" to PageConfig(windowBackgroundColor = Color.WHITE)
+                "com.taobao.tao.welcome.Welcome" to PageConfig(
+                    navigationColor = Color.WHITE,
+                    windowBackgroundColor = Color.WHITE
+                )
+            ), general = GeneralConfig(
+                tbE2E
             )
         )
         savePref(tbConfig.packageName, tbConfig)
-
-        val mmE2E = PageConfig(edgeToEdge = true)
-        val mmConfig = AppConfig(
-            "com.tencent.mm",
-            1, mapOf(
-//                "com.tencent.mm.plugin.sns.ui.improve.ImproveSnsTimelineUI" to mmE2E,// 朋友圈
-                "com.tencent.mm.plugin.sns.ui.SnsUserUI" to mmE2E,// 我的朋友圈
-                "com.tencent.mm.plugin.webview.ui.tools.MMWebViewUI" to mmE2E,// 网页
-                "com.tencent.mm.plugin.subapp.ui.gallery.GestureGalleryUI" to mmE2E,// 网页图片预览
-                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI00" to mmE2E,// 小程序
-                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI01" to mmE2E,
-                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI02" to mmE2E,
-                "com.tencent.mm.plugin.appbrand.ui.AppBrandUI03" to mmE2E,
-                "com.tencent.mm.plugin.appbrand.ui.AppBrandUIMoveTaskToBackStubUI0" to mmE2E// 小程序转场
-            )
-        )
-        savePref(mmConfig.packageName, mmConfig)
 
         // 电笠
         val dlE2E = PageConfig(edgeToEdge = true)
@@ -170,14 +166,15 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>() {
                     windowBackgroundColor = COLOR_INT_UI_MODE_NIGHT,
                     uiModeWBC = Pair(Color.WHITE, Color.parseColor("#111111"))
                 ),
+                // todo white bottom nav issue
                 "com.max.xiaoheihe.module.bbs.ChannelsDetailActivity" to bbGeneral,
                 "com.max.xiaoheihe.module.webview.WebActionActivity" to bbGeneral,
                 // view is right but setting padding isn't work
-/*                "com.max.xiaoheihe.module.miniprogram.MiniProgramHostActivity" to bbGeneral.copy(windowBackgroundColor = Color.CYAN,
-                    extraActions = listOf(
-                        ExtraAction("vg_webview_container", false, false, true, false, 0,true)
-                    )
-                )*/
+                /*                "com.max.xiaoheihe.module.miniprogram.MiniProgramHostActivity" to bbGeneral.copy(windowBackgroundColor = Color.CYAN,
+                                    extraActions = listOf(
+                                        ExtraAction("vg_webview_container", false, false, true, false, 0,true)
+                                    )
+                                )*/
             ),
         )
         savePref(bbConfig.packageName, bbConfig)
