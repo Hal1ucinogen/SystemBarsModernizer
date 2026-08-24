@@ -11,6 +11,10 @@ import androidx.annotation.StyleRes
 import androidx.annotation.StyleableRes
 import androidx.appcompat.widget.TintTypedArray
 
+import android.content.res.Resources
+
+fun Context.getDimensionPixelSize(@DimenRes id: Int) = resources.getDimensionPixelSize(id)
+
 fun Context.getColorByAttr(@AttrRes attr: Int): Int =
     getColorStateListByAttr(attr).defaultColor
 
@@ -29,9 +33,9 @@ fun Context.obtainStyledAttributesCompat(
     TintTypedArray.obtainStyledAttributes(this, set, attrs, defStyleAttr, defStyleRes)
 
 @SuppressLint("DiscouragedApi", "InternalInsetResource")
- fun Activity.getNavigationHeight(): Int {
+fun Activity.getNavigationHeight(): Int {
     val height: Int = try {
-        val resources = this.resources
+        val resources = Resources.getSystem()
         val resourceId =
             resources.getIdentifier("navigation_bar_height", "dimen", "android")
         resources.getDimensionPixelSize(resourceId)
@@ -44,7 +48,7 @@ fun Context.obtainStyledAttributesCompat(
 @SuppressLint("DiscouragedApi", "InternalInsetResource")
 fun Activity.getStatusHeight(): Int {
     val height: Int = try {
-        val resources = this.resources
+        val resources = Resources.getSystem()
         val resourceId =
             resources.getIdentifier("status_bar_height", "dimen", "android")
         resources.getDimensionPixelSize(resourceId)

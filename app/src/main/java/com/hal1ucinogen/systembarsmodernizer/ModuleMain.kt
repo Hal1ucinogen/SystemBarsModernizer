@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.app.Instrumentation
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -13,6 +15,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
 import androidx.core.view.marginBottom
@@ -22,6 +25,7 @@ import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
 import com.hal1ucinogen.systembarsmodernizer.tool.Task
 import com.hal1ucinogen.systembarsmodernizer.util.getNavigationHeight
 import com.hal1ucinogen.systembarsmodernizer.util.getStatusHeight
@@ -93,6 +97,172 @@ class ModuleMain : XposedModule() {
                 }
                 chain.proceed()
             }
+
+            val setPaddingMethod = View::class.java.getDeclaredMethod(
+                "setPadding",
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType
+            )
+            hook(setPaddingMethod).intercept { chain ->
+                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
+                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
+                    ?: return@intercept chain.proceed()
+                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
+
+                val entryName = if (view.id != View.NO_ID) {
+                    runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+                } else null
+
+                val isDecor = view === activity.window.decorView
+                val isDecorChild = view.parent === activity.window.decorView
+                val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
+
+                val action = pageConfig.extraActions.firstOrNull { act ->
+                    if (!act.isPadding) return@firstOrNull false
+                    if (act.viewId == "decor") {
+                        if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
+                    } else if (act.viewId == "content" || act.viewId == "android:id/content") {
+                        view.id == android.R.id.content
+                    } else {
+                        entryName != null && act.viewId == entryName
+                    }
+                } ?: return@intercept chain.proceed()
+
+                val inset = if (action.useSystemInsets) {
+                    if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
+                } else {
+                    action.customInset
+                }
+
+                var top = chain.args[1] as Int
+                var bottom = chain.args[3] as Int
+                if (action.isTop) {
+                    top = inset
+                } else {
+                    bottom = inset
+                }
+
+                return@intercept chain.proceed(
+                    arrayOf(chain.args[0], top, chain.args[2], bottom)
+                )
+            }
+
+            val setPaddingRelativeMethod = View::class.java.getDeclaredMethod(
+                "setPaddingRelative",
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType
+            )
+            hook(setPaddingRelativeMethod).intercept { chain ->
+                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
+                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
+                    ?: return@intercept chain.proceed()
+                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
+
+                val entryName = if (view.id != View.NO_ID) {
+                    runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+                } else null
+
+                val isDecor = view === activity.window.decorView
+                val isDecorChild = view.parent === activity.window.decorView
+                val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
+
+                val action = pageConfig.extraActions.firstOrNull { act ->
+                    if (!act.isPadding) return@firstOrNull false
+                    if (act.viewId == "decor") {
+                        if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
+                    } else if (act.viewId == "content" || act.viewId == "android:id/content") {
+                        view.id == android.R.id.content
+                    } else {
+                        entryName != null && act.viewId == entryName
+                    }
+                } ?: return@intercept chain.proceed()
+
+                val inset = if (action.useSystemInsets) {
+                    if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
+                } else {
+                    action.customInset
+                }
+
+                var top = chain.args[1] as Int
+                var bottom = chain.args[3] as Int
+                if (action.isTop) {
+                    top = inset
+                } else {
+                    bottom = inset
+                }
+
+                return@intercept chain.proceed(
+                    arrayOf(chain.args[0], top, chain.args[2], bottom)
+                )
+            }
+
+            val setVisibilityMethod = View::class.java.getDeclaredMethod(
+                "setVisibility",
+                Int::class.javaPrimitiveType
+            )
+            hook(setVisibilityMethod).intercept { chain ->
+                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
+                if (view.id == View.NO_ID) return@intercept chain.proceed()
+                val entryName = runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+                    ?: return@intercept chain.proceed()
+
+                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
+                    ?: return@intercept chain.proceed()
+                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
+                val action = pageConfig.extraActions.firstOrNull { it.isGone && it.viewId == entryName }
+                    ?: return@intercept chain.proceed()
+
+                return@intercept chain.proceed(arrayOf(View.GONE))
+            }
+
+            val setLayoutParamsMethod = View::class.java.getDeclaredMethod(
+                "setLayoutParams",
+                ViewGroup.LayoutParams::class.java
+            )
+            hook(setLayoutParamsMethod).intercept { chain ->
+                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
+                val params = chain.args[0] as? ViewGroup.MarginLayoutParams ?: return@intercept chain.proceed()
+                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
+                    ?: return@intercept chain.proceed()
+                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
+
+                val entryName = if (view.id != View.NO_ID) {
+                    runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+                } else null
+
+                val isDecor = view === activity.window.decorView
+                val isDecorChild = view.parent === activity.window.decorView
+                val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
+
+                val action = pageConfig.extraActions.firstOrNull { act ->
+                    if (act.isPadding || act.isGone) return@firstOrNull false
+                    if (act.viewId == "decor") {
+                        if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
+                    } else if (act.viewId == "content" || act.viewId == "android:id/content") {
+                        view.id == android.R.id.content
+                    } else {
+                        entryName != null && act.viewId == entryName
+                    }
+                } ?: return@intercept chain.proceed()
+
+                val inset = if (action.useSystemInsets) {
+                    if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
+                } else {
+                    action.customInset
+                }
+
+                if (action.isTop) {
+                    params.topMargin = inset
+                } else {
+                    params.bottomMargin = inset
+                }
+
+                return@intercept chain.proceed(arrayOf(params))
+            }
         } catch (e: UnsupportedOperationException) {
             log(Log.INFO, TAG, "app config access failed", e)
         } catch (e: Exception) {
@@ -100,27 +270,92 @@ class ModuleMain : XposedModule() {
         }
     }
 
+    override fun onHotReloading(param: XposedModuleInterface.HotReloadingParam): Boolean {
+        log(Log.INFO, TAG, "onHotReloading")
+        param.setSavedInstanceState("Hello from last generation")
+        return super.onHotReloading(param)
+    }
+
+    override fun onHotReloaded(param: XposedModuleInterface.HotReloadedParam) {
+        log(Log.INFO, TAG, "onHotReloaded: ${param.processName}, ${param.oldHookHandles.size} old hooks")
+        log(Log.INFO, TAG, "savedInstanceState: " + param.savedInstanceState)
+        param.oldHookHandles.forEach { it.unhook() }
+    }
+
     override fun onSystemServerStarting(param: SystemServerStartingParam) {
         log(Log.INFO, TAG, "onSystemServerStarting, system classloader: " + param.classLoader)
+    }
+
+    private fun Context.findActivity(): Activity? {
+        var ctx: Context? = this
+        while (ctx is ContextWrapper) {
+            if (ctx is Activity) return ctx
+            ctx = ctx.baseContext
+        }
+        return null
+    }
+
+    private fun getPageConfig(activity: Activity): PageConfig? {
+        val config = configMap[activity.packageName] ?: return null
+        val activityName = activity.javaClass.name
+        val scope = config.scope
+
+        // 1. 优先精确匹配
+        var pageConfig = scope[activityName]
+
+        // 2. 内部类/影子多任务类自动继承外部基类规则 (例如 XRiverActivity$App01 -> XRiverActivity)
+        if (pageConfig == null && activityName.contains("$")) {
+            val baseClassName = activityName.substringBefore("$")
+            pageConfig = scope[baseClassName]
+        }
+
+        // 3. 通配符/前缀匹配 (支持 key 以 * 结尾，例如 "com.alipay.android.phone.msgboxapp.ui.activity.*")
+        if (pageConfig == null) {
+            pageConfig = scope.entries.firstOrNull { (key, _) ->
+                key.endsWith("*") && activityName.startsWith(key.removeSuffix("*"))
+            }?.value
+        }
+
+        // 4. 通用兜底规则 (GeneralConfig)
+        if (pageConfig == null) {
+            val general = config.general
+            val isExclusive = general?.exclusive?.any { excl ->
+                activityName == excl ||
+                (activityName.contains("$") && activityName.substringBefore("$") == excl) ||
+                (excl.endsWith("*") && activityName.startsWith(excl.removeSuffix("*")))
+            } ?: false
+
+            if (general == null || isExclusive) {
+                return null
+            } else {
+                pageConfig = config.general.config
+            }
+        }
+        return pageConfig
+    }
+
+    private fun View.findViewByEntryName(targetEntryName: String): View? {
+        if (this.id != View.NO_ID) {
+            val entryName = runCatching { this.resources.getResourceEntryName(this.id) }.getOrNull()
+            if (entryName == targetEntryName) {
+                return this
+            }
+        }
+        if (this is ViewGroup) {
+            for (i in 0 until this.childCount) {
+                val found = this.getChildAt(i).findViewByEntryName(targetEntryName)
+                if (found != null) return found
+            }
+        }
+        return null
     }
 
     private fun doOnActivityCreated(chain: XposedInterface.Chain) {
         val activity = chain.thisObject as? Activity ?: return
         val window = activity.window
         log(Log.INFO, TAG, "Activity onCreate | ${activity.javaClass.name}")
-        val config = configMap[activity.packageName] ?: return
-        val activityName = activity.javaClass.name
-        val scope = config.scope
-        var pageConfig = scope[activityName]
-        if (pageConfig == null) {
-            val general = config.general
-            if (general == null || activityName in general.exclusive) {
-                return
-            } else {
-                pageConfig = config.general.config
-            }
-        }
-        log(Log.INFO, TAG, "Activity $activityName config | $pageConfig")
+        val pageConfig = getPageConfig(activity) ?: return
+        log(Log.INFO, TAG, "Activity ${activity.javaClass.name} config | $pageConfig")
         if (pageConfig.edgeToEdge) {
             pageConfig.windowBackgroundColor?.let {
                 window.setBackgroundDrawable(
@@ -143,12 +378,42 @@ class ModuleMain : XposedModule() {
             pageConfig.extraActions.forEach { extraAction ->
                 log(Log.INFO, TAG, "In ExtraAction | $extraAction")
                 Task.onMain(100) {
-                    val resources = window.decorView.resources
-                    val id = resources.getIdentifier(
-                        extraAction.viewId,
-                        "id",
-                        activity.packageName
-                    )
+                    val target = when (extraAction.viewId) {
+                        "decor" -> {
+                            val decor = window.decorView as? ViewGroup
+                            if (extraAction.self) decor else decor?.getChildAt(extraAction.childIndex)
+                        }
+                        "content", "android:id/content" -> activity.findViewById<View>(android.R.id.content)
+                        else -> {
+                            if (extraAction.isGroup) {
+                                val group = run {
+                                    val id = window.decorView.resources.getIdentifier(
+                                        extraAction.viewId,
+                                        "id",
+                                        activity.packageName
+                                    )
+                                    val v = if (id != 0) activity.findViewById<ViewGroup>(id) else null
+                                    v ?: (window.decorView.findViewByEntryName(extraAction.viewId) as? ViewGroup)
+                                }
+                                if (group != null) {
+                                    if (extraAction.self) {
+                                        group
+                                    } else {
+                                        group.children.elementAtOrNull(extraAction.childIndex)
+                                    }
+                                } else null
+                            } else {
+                                val id = window.decorView.resources.getIdentifier(
+                                    extraAction.viewId,
+                                    "id",
+                                    activity.packageName
+                                )
+                                val v = if (id != 0) activity.findViewById<View>(id) else null
+                                v ?: window.decorView.findViewByEntryName(extraAction.viewId)
+                            }
+                        }
+                    } ?: return@onMain
+
                     val inset = if (extraAction.useSystemInsets) {
                         if (extraAction.isTop) {
                             activity.getStatusHeight()
@@ -158,16 +423,6 @@ class ModuleMain : XposedModule() {
                     } else {
                         extraAction.customInset
                     }
-                    val target = if (extraAction.isGroup) {
-                        val group = activity.findViewById<ViewGroup>(id)
-                        if (extraAction.self) {
-                            group
-                        } else {
-                            group.children.elementAtOrNull(extraAction.childIndex)
-                        }
-                    } else {
-                        activity.findViewById<View>(id)
-                    } ?: return@onMain
                     log(Log.INFO, TAG, "Find Target - $target")
                     log(
                         Log.INFO,
@@ -179,7 +434,12 @@ class ModuleMain : XposedModule() {
                         TAG,
                         "Target Margin - ${target.marginTop}|${target.marginBottom}|${target.marginStart}|${target.marginEnd}"
                     )
-                    if (extraAction.isPadding) {
+                    if (extraAction.isGone) {
+                        target.visibility = View.GONE
+                        target.updateLayoutParams<ViewGroup.LayoutParams> {
+                            height = 0
+                        }
+                    } else if (extraAction.isPadding) {
                         if (extraAction.isTop) {
                             target.updatePadding(top = inset)
                         } else {
@@ -188,13 +448,11 @@ class ModuleMain : XposedModule() {
                     } else {
                         if (extraAction.isTop) {
                             target.updateLayoutParams<ViewGroup.LayoutParams> {
-                                (this as ViewGroup.MarginLayoutParams).topMargin =
-                                    inset
+                                (this as? ViewGroup.MarginLayoutParams)?.topMargin = inset
                             }
                         } else {
                             target.updateLayoutParams<ViewGroup.LayoutParams> {
-                                (this as ViewGroup.MarginLayoutParams).bottomMargin =
-                                    inset
+                                (this as? ViewGroup.MarginLayoutParams)?.bottomMargin = inset
                             }
                         }
                     }
@@ -202,21 +460,17 @@ class ModuleMain : XposedModule() {
             }
         } else {
             Task.onMain(100) {
-                pageConfig.windowBackgroundColor?.let {
-                    if (it == COLOR_INT_UI_MODE_NIGHT) {
-                        val currentNightMode =
-                            activity.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                        val color = when (currentNightMode) {
-                            Configuration.UI_MODE_NIGHT_NO -> pageConfig.uiModeWBC.first// Night mode is not active, we're using the light theme.
-                            Configuration.UI_MODE_NIGHT_YES -> pageConfig.uiModeWBC.second // Night mode is active, we're using dark theme.
-                            else -> pageConfig.uiModeWBC.second
-                        }
-                        window.setBackgroundDrawable(ColorDrawable(color))
-                    } else {
-                        window.setBackgroundDrawable(
-                            ColorDrawable(it)
-                        )
+                if (pageConfig.uiModeWBC != null) {
+                    val currentNightMode =
+                        activity.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                    val color = when (currentNightMode) {
+                        Configuration.UI_MODE_NIGHT_NO -> pageConfig.uiModeWBC.first// Night mode is not active, we're using the light theme.
+                        Configuration.UI_MODE_NIGHT_YES -> pageConfig.uiModeWBC.second // Night mode is active, we're using dark theme.
+                        else -> pageConfig.uiModeWBC.second
                     }
+                    window.setBackgroundDrawable(color.toDrawable())
+                } else if (pageConfig.windowBackgroundColor != null) {
+                    window.setBackgroundDrawable(pageConfig.windowBackgroundColor.toDrawable())
                 }
                 if (pageConfig.clearTranslucent) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -226,11 +480,44 @@ class ModuleMain : XposedModule() {
                 window.statusBarColor = pageConfig.statusColor
                 window.isStatusBarContrastEnforced = false
                 window.decorView.post {
-                    window.navigationBarColor = Color.TRANSPARENT
+                    window.navigationBarColor = pageConfig.navigationColor
                     window.isNavigationBarContrastEnforced = false
                 }
             }
         }
 
+        Task.onMain(1000) {
+            log(Log.INFO, TAG, "=== View Hierarchy Dump for ${activity.javaClass.name} ===")
+            dumpViewHierarchy(window.decorView)
+            log(Log.INFO, TAG, "=== End of Dump for ${activity.javaClass.name} ===")
+        }
+    }
+
+    private fun dumpViewHierarchy(view: View, depth: Int = 0) {
+        if (depth > 15) return
+        val idName = if (view.id != View.NO_ID) {
+            runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+        } else null
+
+        val indent = "  ".repeat(depth)
+        val idStr = if (idName != null) " id=@id/$idName" else ""
+        val padStr = "pad=[T:${view.paddingTop}, B:${view.paddingBottom}, S:${view.paddingStart}, E:${view.paddingEnd}]"
+        val marginStr = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+            " mar=[T:${it.topMargin}, B:${it.bottomMargin}, S:${it.marginStart}, E:${it.marginEnd}]"
+        } ?: ""
+        val visStr = when (view.visibility) {
+            View.GONE -> " GONE"
+            View.INVISIBLE -> " INVISIBLE"
+            else -> ""
+        }
+        val sizeStr = " (${view.width}x${view.height})"
+
+        log(Log.INFO, TAG, "$indent- [${view.javaClass.simpleName}]$idStr$sizeStr$visStr $padStr$marginStr")
+
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                dumpViewHierarchy(view.getChildAt(i), depth + 1)
+            }
+        }
     }
 }

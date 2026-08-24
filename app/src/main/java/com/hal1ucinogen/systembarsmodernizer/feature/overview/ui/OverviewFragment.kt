@@ -3,7 +3,6 @@ package com.hal1ucinogen.systembarsmodernizer.feature.overview.ui
 import android.graphics.Color
 import android.widget.Toast
 import androidx.core.content.edit
-import com.hal1ucinogen.systembarsmodernizer.COLOR_INT_UI_MODE_NIGHT
 import com.hal1ucinogen.systembarsmodernizer.CONFIG_PREF_NAME
 import com.hal1ucinogen.systembarsmodernizer.SBMApp
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
@@ -137,19 +136,98 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>(), SBMApp.Service
         savePref(checkerConfig.packageName, checkerConfig)
 
         // 淘宝
-        val tbE2E = PageConfig(edgeToEdge = true)
+        val tbDecorConfig = PageConfig(
+            edgeToEdge = true,
+            extraActions = listOf(
+                ExtraAction(
+                    viewId = "decor",
+                    isGroup = true,
+                    self = false,
+                    childIndex = 0,
+                    isTop = false,
+                    isPadding = false,
+                    useSystemInsets = false,
+                    customInset = 0
+                )
+            )
+        )
         val tbConfig = AppConfig(
             "com.taobao.taobao",
             1, mapOf(
                 "com.taobao.tao.welcome.Welcome" to PageConfig(
-                    navigationColor = Color.WHITE,
+                    navigationColor = Color.TRANSPARENT,
                     windowBackgroundColor = Color.WHITE
-                )
+                ),
+                "com.taobao.themis.container.app.TMSActivity" to tbDecorConfig,
+                "com.taobao.android.detail2.core.framework.NewDetailActivity" to tbDecorConfig,
+                "com.taobao.weex.weexv2.page.WeexV2Activity" to tbDecorConfig
             ), general = GeneralConfig(
-                tbE2E
+                PageConfig(edgeToEdge = true), exclusive = listOf(
+                    "com.taobao.android.detail.alittdetail.TTDetailActivity",
+                    "com.taobao.android.purchase.aura.TBBuyActivity"
+                )
             )
         )
         savePref(tbConfig.packageName, tbConfig)
+
+        // 支付宝
+        val navPlaceholderConfig = PageConfig(
+            edgeToEdge = true,
+            extraActions = listOf(
+                ExtraAction(
+                    viewId = "v_navbar_placeholder",
+                    isGone = true
+                )
+            )
+        )
+        val decorConfig = PageConfig(
+            edgeToEdge = true,
+            extraActions = listOf(
+                ExtraAction(
+                    viewId = "decor",
+                    isGroup = true,
+                    self = false,
+                    childIndex = 0,
+                    isTop = false,
+                    isPadding = true,
+                    useSystemInsets = false,
+                    customInset = 0
+                )
+            )
+        )
+        val aliPayConfig = AppConfig(
+            "com.eg.android.AlipayGphone",
+            1, mapOf(
+                "com.alipay.mobile.nebulax.xriver.activity.XRiverActivity" to PageConfig(
+                    edgeToEdge = true,
+                    extraActions = listOf(
+                        ExtraAction(
+                            viewId = "nebulax_root_view",
+                            isGroup = false,
+                            isTop = false,
+                            isPadding = true,
+                            useSystemInsets = false,
+                            customInset = 0
+                        )
+                    )
+                ),
+                "com.alipay.android.phone.msgboxapp.ui.activity.*" to navPlaceholderConfig,
+                "com.alipay.mobile.antcardsdk.cardapp.CSPushActivity" to decorConfig,
+                "com.alipay.mobile.socialcontactsdk.contact.ui.ContactMainPageActivity" to decorConfig,
+                "com.alipay.mobile.chatapp.ui.PersonalChatMsgActivity_" to
+                        PageConfig(
+                            navigationColor = Color.WHITE,
+                            windowBackgroundColor = Color.WHITE
+                        )
+            ), general = GeneralConfig(
+                PageConfig(edgeToEdge = true),
+                exclusive = listOf(
+                    "com.eg.android.AlipayGphone.AlipayLogin",
+                )
+            )
+        )
+        savePref(aliPayConfig.packageName, aliPayConfig)
+
 
         // 电笠
         val dlE2E = PageConfig(edgeToEdge = true)
@@ -163,7 +241,6 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>(), SBMApp.Service
             mapOf(
                 "com.max.xiaoheihe.MainActivity" to PageConfig(
                     edgeToEdge = false,
-                    windowBackgroundColor = COLOR_INT_UI_MODE_NIGHT,
                     uiModeWBC = Pair(Color.WHITE, Color.parseColor("#111111"))
                 ),
                 // todo white bottom nav issue
