@@ -7,4 +7,84 @@
     <string name="title_settings">Settings</string>
 
     <string name="empty_list">Empty list</string>
+    <string name="action_search">Search</string>
+    <string name="action_filter">Filter</string>
+    <string name="filter_all">All Apps</string>
+    <string name="filter_configured_only">Configured Only</string>
+    <string name="filter_user_only">User Apps Only</string>
+    <string name="filter_system_only">System Apps Only</string>
+    <string name="action_refresh">Refresh List</string>
+
+    <!-- App Detail -->
+    <string name="title_app_detail">App Configuration</string>
+    <string name="empty_config_title">No Configuration Available</string>
+    <string name="empty_config_desc">Create a configuration to enable Edge-to-Edge, blacklist exclusions, and advanced page-level adjustments.</string>
+    <string name="btn_create_config">Create Configuration</string>
+
+    <string name="section_general_config">General Rules</string>
+    <string name="desc_general_config">Global rules applied across the entire app, except excluded pages.</string>
+    <string name="no_general_config">No General Rules Configured</string>
+    <string name="desc_no_general_config">This app relies solely on page-specific rules or system defaults.</string>
+    <string name="switch_enable_general">Enable General Rules</string>
+    <string name="switch_global_edge_to_edge">Edge-to-Edge</string>
+    <string name="btn_edit_general_page_config">Edit General Properties</string>
+    <string name="exclusive_activities">Excluded Activities</string>
+    <string name="btn_add_exclusive">Add Excluded Page</string>
+    <string name="no_exclusive_activities">No excluded activities</string>
+    
+    <string name="section_scope_config">Page-Specific Rules (Scope)</string>
+    <string name="desc_scope_config">Specific rules and custom adjustments for individual Activities.</string>
+    <string name="btn_add_scope_rule">Add Page Rule</string>
+    <string name="no_scope_rules">No page-specific rules</string>
+    
+    <string name="action_reset_default">Reset to Default</string>
+    <string name="action_clear_config">Clear Configuration</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    
+    <string name="dialog_title_pick_activity">Select Activity</string>
+    <string name="hint_search_activity">Search Activity or enter wildcard...</string>
+    <string name="btn_custom_activity">Use Custom/Wildcard</string>
+    
+    <string name="dialog_title_page_config">Edit Page Rule</string>
+    <string name="dialog_title_page_config_detail">Page Rule Details</string>
+    <string name="field_activity_name">Activity / Pattern</string>
+    <string name="switch_edge_to_edge">Edge-to-Edge</string>
+    <string name="switch_clear_translucent">Clear Translucent Flags</string>
+    <string name="field_window_bg_color">Window Background Color</string>
+    <string name="section_extra_actions">Extra View Actions</string>
+    <string name="btn_add_extra_action">Add View Action</string>
+    <string name="no_extra_actions">No extra view actions</string>
+    
+    <string name="dialog_title_extra_action">Edit View Action</string>
+    <string name="field_view_id">View ID / Target</string>
+    <string name="hint_view_id">e.g. decor, content, or resource id</string>
+    <string name="action_type">Action Type</string>
+    <string name="action_type_padding">Apply Padding</string>
+    <string name="action_type_margin">Apply Margin</string>
+    <string name="action_type_gone">Set View GONE</string>
+    <string name="target_bar">Target System Bar</string>
+    <string name="target_bar_status">Top (Status Bar)</string>
+    <string name="target_bar_nav">Bottom (Navigation Bar)</string>
+    <string name="switch_use_system_insets">Use System Insets Height</string>
+    <string name="field_custom_inset">Custom Inset (px)</string>
+    <string name="switch_is_group">Target is ViewGroup</string>
+    <string name="switch_self">Apply to Self</string>
+    <string name="field_child_index">Child Index (-1 for all/none)</string>
+    
+    <string name="msg_config_saved">Configuration saved and synced to LSPosed</string>
+    <string name="msg_config_reset">Configuration reset to default</string>
+    <string name="msg_config_cleared">Configuration cleared</string>
+    
+    <!-- Config Edit & Detail Actions -->
+    <string name="title_app_config_edit">Edit Configuration</string>
+    <string name="btn_edit_config">Edit Rules</string>
+    <string name="state_global_e2e_enabled">Global Edge-to-Edge: Enabled</string>
+    <string name="state_global_e2e_disabled">Global Edge-to-Edge: Disabled</string>
+    <string name="dialog_discard_title">Discard Changes?</string>
+    <string name="dialog_discard_message">You have unsaved changes. Are you sure you want to discard them?</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_keep_editing">Keep Editing</string>
 </resources>

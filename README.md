@@ -2,7 +2,7 @@
 
 # SystemBarsModernizer (SBM)
 
-**让 Android 应用拥抱真·沉浸式边到边（Edge-to-Edge）现代化系统栏体验**
+**让 Android 应用拥抱真·边到边（Edge-to-Edge）现代化系统栏体验**
 
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg?style=flat-square)](https://www.android.com)
 [![API](https://img.shields.io/badge/API-29%2B%20(Android%2010%2B)-brightgreen.svg?style=flat-square)](https://android-arsenal.com/api?level=29)
@@ -20,7 +20,7 @@
 
 在现代 Android 系统（特别是 Android 10+ 的手势导航时代）中，许多第三方应用依然保留着传统的黑底导航栏、生硬的状态栏垫高（Padding）或者自定义的底部占位 View（如 72px 导航占位条），破坏了全面屏的无缝视觉体验。
 
-**SystemBarsModernizer (SBM)** 是一个基于现代化 **LibXposed (API 102)** 标准构建的高性能 Xposed 模块。它通过在系统框架层与视图层进行精准拦截与参数改写，为各类应用强制启用 **Edge-to-Edge 边到边沉浸式渲染**，并提供细粒度的布局边距矫正引擎，彻底消除黑条、切边与多余垫高。
+**SystemBarsModernizer (SBM)** 是一个基于现代化 **LibXposed (API 102)** 标准构建的高性能 Xposed 模块。它通过在系统框架层与视图层进行精准拦截与参数改写，为各类应用强制启用 **Edge-to-Edge 边到边渲染**，并提供细粒度的布局边距矫正引擎，彻底消除黑条、切边与多余垫高。
 
 ---
 
@@ -28,7 +28,7 @@
 
 - 🚀 **全面适配现代 LibXposed API 102**：
   采用现代化的无侵入 Xposed 架构，支持 `onPackageReady`、`onHotReloading` / `onHotReloaded` 生命周期管理与 RemotePreferences 配置共享。
-- 🎨 **真·边到边沉浸式（Edge-to-Edge）**：
+- 🎨 **真·边到边（Edge-to-Edge）**：
   强制解锁系统栏透明底色，关闭 Android 系统的深色对比度遮罩（`isStatusBarContrastEnforced / isNavigationBarContrastEnforced = false`），并支持自动根据背景亮度适配亮/暗色状态栏与导航手势条。
 - 🛠️ **强大的 ExtraAction 布局矫正引擎**：
   - **Padding（内边距）矫正**：动态重置或注入顶部状态栏/底部导航栏 Insets；
@@ -67,7 +67,7 @@
     │ Activity.onCreate│ │ View.setPadding│ │setLayoutParams│
     └───────┬────────┘ └───────┬────────┘ └───────┬────────┘
             │                  │                  │
-   设置 Window 沉浸      Fast-Path 短路    Fast-Path 短路
+   设置 Window 边到边     Fast-Path 短路    Fast-Path 短路
    注入系统透明栏颜色     执行 Padding 改写  执行 Margin 改写
             │                  │                  │
             └──────────────────┴──────────────────┘
@@ -77,13 +77,13 @@
 
 ## ⚙️ 规则配置与 ExtraAction 引擎
 
-SBM 采用结构化的数据模型描述每个应用和页面的沉浸式行为：
+SBM 采用结构化的数据模型描述每个应用和页面的边到边行为：
 
 ### 1. `PageConfig` 结构说明
 
 ```kotlin
 data class PageConfig(
-    val edgeToEdge: Boolean = false,          // 是否启用全屏边到边沉浸
+    val edgeToEdge: Boolean = false,          // 是否启用全屏边到边
     val clearTranslucent: Boolean = false,     // 是否清除半透明 Window 标记
     val windowBackgroundColor: Int? = null,    // 强制设置 Window 背景颜色
     val statusColor: Int = Color.TRANSPARENT,   // 状态栏颜色
@@ -132,7 +132,7 @@ data class ExtraAction(
 
 - [ ] **应用列表可视化（App List）**：
   - 扫描并展示设备上已安装的全部第三方与系统应用；
-  - 异步加载应用图标、名称、包名与沉浸式启用状态；
+  - 异步加载应用图标、名称、包名与边到边启用状态；
   - 采用 Room 数据库 + MVVM + DiffUtil 扁平化自定义 View 极速渲染。
 - [ ] **规则配置动态编辑器（Rule Editor & CRUD）**：
   - 支持按应用查看所有页面规则（`PageConfig`）与高级动作（`ExtraAction`）；
@@ -143,7 +143,7 @@ data class ExtraAction(
   - 无需重启 LSPosed 或手机，应用切到前台即可实时读取最新配置并热生效。
 - [ ] **规则云端订阅与导入导出**：
   - 支持规则配置 JSON 导出与本地备份导入；
-  - 支持在线订阅社区贡献的 App 沉浸式适配规则池。
+  - 支持在线订阅社区贡献的 App 边到边适配规则池。
 
 ---
 
@@ -157,7 +157,7 @@ data class ExtraAction(
 1. 在 [Releases](../../releases) 中下载最新的 APK 并安装；
 2. 打开 LSPosed 管理器，在模块列表中勾选 **SystemBarsModernizer** 并启用；
 3. 选择需要生效的目标应用作用域；
-4. 强行停止目标应用后重新打开，即可享受丝滑的边到边沉浸式体验。
+4. 强行停止目标应用后重新打开，即可享受丝滑的边到边体验。
 
 ---
 
@@ -185,7 +185,7 @@ cd SystemBarsModernizer
 
 ## ⚠️ 免责声明 (Disclaimer)
 
-1. **用途限制**：本项目（SystemBarsModernizer）仅用于 Android 视图系统（View System）与边到边沉浸式（Edge-to-Edge）渲染技术的学习、研究与个人视觉体验优化。
+1. **用途限制**：本项目（SystemBarsModernizer）仅用于 Android 视图系统（View System）与边到边（Edge-to-Edge）渲染技术的学习、研究与个人视觉体验优化。
 2. **实现原理**：本项目仅在用户已取得 Root/框架授权的本地设备内存（RAM）中，通过公开的系统视图接口对视图边距和系统栏颜色进行运行时局部调整。**本项目不包含任何破解、反编译、逆向工程或重新分发第三方应用程序 APK 原文件的行为，亦不篡改任何应用程序的业务逻辑、数据通信与安全机制。**
 3. **商标与版权**：文档与代码中提及的所有第三方应用名称、包名及商标，其知识产权与商标权均归其各自的合法所有者所有，仅作为兼容性技术参考，与本项目作者无任何商业关联。
 4. **使用风险**：用户需自行承担使用 Xposed 模块的相关风险，作者不对因使用本软件造成的任何直接或间接影响承担法律责任。

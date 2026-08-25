@@ -10,12 +10,35 @@ import com.hal1ucinogen.systembarsmodernizer.util.PackageUtils
 import com.hal1ucinogen.systembarsmodernizer.util.UiUtils
 import io.github.libxposed.service.XposedService
 import io.github.libxposed.service.XposedServiceHelper
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import com.hal1ucinogen.systembarsmodernizer.coil.AppIconFetcher
+import com.hal1ucinogen.systembarsmodernizer.coil.AppIconKeyer
+import com.hal1ucinogen.systembarsmodernizer.coil.SBMItemFetcher
+import com.hal1ucinogen.systembarsmodernizer.coil.SBMItemKeyer
+import com.hal1ucinogen.systembarsmodernizer.database.SBMDatabase
+import com.hal1ucinogen.systembarsmodernizer.feature.applist.data.repository.AppListRepository
 import rikka.material.app.LocaleDelegate
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArraySet
 import kotlin.concurrent.Volatile
 
-class SBMApp : Application(), XposedServiceHelper.OnServiceListener {
+class SBMApp : Application(), XposedServiceHelper.OnServiceListener, ImageLoaderFactory {
+
+    val database by lazy { SBMDatabase.getDatabase(this) }
+    val repository by lazy { AppListRepository(database.sbmItemDao()) }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .components {
+                add(AppIconKeyer())
+                add(AppIconFetcher.Factory(this@SBMApp))
+                add(SBMItemKeyer())
+                add(SBMItemFetcher.Factory(this@SBMApp))
+            }
+            .crossfade(true)
+            .build()
+    }
 
     companion object {
         //noinspection StaticFieldLeak

@@ -1,10 +1,7 @@
 package com.hal1ucinogen.systembarsmodernizer.bean
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class ExtraAction(
     val viewId: String,
@@ -16,4 +13,4 @@ data class ExtraAction(
     val self: Boolean = true,
     val childIndex: Int = -1,
     val isGone: Boolean = false
-) : Parcelable
+)

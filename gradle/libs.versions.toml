@@ -6,7 +6,7 @@ zhaobozhen = "1.1.5.4"
 
 [plugins]
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version = "2.3.2" }
 
 [libraries]
@@ -20,6 +20,7 @@ androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
 
 google-material = "com.google.android.material:material:1.12.0"
+kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
 
 brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper:3.0.14"
 

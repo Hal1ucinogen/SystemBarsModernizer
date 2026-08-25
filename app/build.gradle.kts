@@ -1,8 +1,7 @@
 plugins {
     id("com.android.application")
     alias(libs.plugins.kotlin.android)
-    kotlin("plugin.serialization") version "1.8.10"
-    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
@@ -51,6 +50,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += listOf(
+            "-opt-in=kotlinx.serialization.InternalSerializationApi",
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
+        )
     }
     packaging {
         resources {
@@ -71,7 +74,7 @@ dependencies {
     implementation(libs.bundles.androidX.lifecycle)
     implementation(libs.bundles.androidX.room)
     ksp(libs.androidX.room.compiler)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation(libs.kotlinx.serialization.json)
     compileOnly("io.github.libxposed:api:102.0.0")
     implementation("io.github.libxposed:service:102.0.0")
     implementation(libs.brvah)

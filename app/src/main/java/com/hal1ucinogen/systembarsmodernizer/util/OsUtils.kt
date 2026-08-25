@@ -3,7 +3,7 @@ package com.hal1ucinogen.systembarsmodernizer.util
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 
-object OsUtil {
+object OsUtils {
   @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
   fun atLeastU(): Boolean {
     return Build.VERSION.SDK_INT >= 34

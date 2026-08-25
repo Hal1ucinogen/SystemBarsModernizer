@@ -30,5 +30,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".feature.appdetail.ui.AppDetailActivity"
+            android:exported="false"
+            android:label="@string/title_app_detail"
+            android:theme="@style/Theme.SystemBarsModernizer" />
+
+        <activity
+            android:name=".feature.appdetail.ui.AppConfigEditActivity"
+            android:exported="false"
+            android:label="@string/title_app_config_edit"
+            android:theme="@style/Theme.SystemBarsModernizer" />
     </application>
 </manifest>
