@@ -2,8 +2,6 @@ package com.hal1ucinogen.systembarsmodernizer
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Application
-import android.app.Instrumentation
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
@@ -44,6 +42,7 @@ class ModuleMain : XposedModule() {
     }
 
     val configMap = mutableMapOf<String, AppConfig>()
+    private val activityConfigCache = java.util.WeakHashMap<Activity, PageConfig?>()
 
     override fun onModuleLoaded(param: ModuleLoadedParam) {
         log(Log.INFO, TAG, "onModuleLoaded: " + param.processName)
@@ -65,9 +64,7 @@ class ModuleMain : XposedModule() {
     override fun onPackageReady(param: XposedModuleInterface.PackageReadyParam) {
         log(Log.INFO, TAG, "onPackageReady: " + param.packageName)
         log(Log.INFO, TAG, "app classloader is " + param.classLoader)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            log(Log.INFO, TAG, "app acf is " + param.appComponentFactory)
-        }
+        log(Log.INFO, TAG, "app acf is " + param.appComponentFactory)
         log(Log.INFO, TAG, "module apk path: " + this.moduleApplicationInfo.sourceDir)
         log(Log.INFO, TAG, "----------")
         if (!param.isFirstPackage) return
@@ -84,120 +81,25 @@ class ModuleMain : XposedModule() {
             val remoteConfig = Json.decodeFromString<AppConfig>(appConfigStr)
             log(Log.INFO, TAG, "Remote prefs: app config - $remoteConfig")
             configMap[packageName] = remoteConfig
-            val callApplicationOnCreateMethod = Instrumentation::class.java.getDeclaredMethod(
-                METHOD_CALL_APPLICATION_ON_CREATE, Application::class.java
+            val onCreateMethod = Activity::class.java.getDeclaredMethod(
+                METHOD_ON_CREATE, Bundle::class.java
             )
-            hook(callApplicationOnCreateMethod).intercept { chain ->
-                val onCreateMethod = Activity::class.java.getDeclaredMethod(
-                    METHOD_ON_CREATE, Bundle::class.java
-                )
-                hook(onCreateMethod).intercept { c ->
-                    c.proceed()
-                    doOnActivityCreated(c)
-                }
-                chain.proceed()
+            hook(onCreateMethod).intercept { c ->
+                c.proceed()
+                doOnActivityCreated(c)
             }
 
-            val setPaddingMethod = View::class.java.getDeclaredMethod(
-                "setPadding",
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType
-            )
-            hook(setPaddingMethod).intercept { chain ->
-                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
-                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
-                    ?: return@intercept chain.proceed()
-                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
-
-                val entryName = if (view.id != View.NO_ID) {
-                    runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
-                } else null
-
-                val isDecor = view === activity.window.decorView
-                val isDecorChild = view.parent === activity.window.decorView
-                val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
-
-                val action = pageConfig.extraActions.firstOrNull { act ->
-                    if (!act.isPadding) return@firstOrNull false
-                    if (act.viewId == "decor") {
-                        if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
-                    } else if (act.viewId == "content" || act.viewId == "android:id/content") {
-                        view.id == android.R.id.content
-                    } else {
-                        entryName != null && act.viewId == entryName
-                    }
-                } ?: return@intercept chain.proceed()
-
-                val inset = if (action.useSystemInsets) {
-                    if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
-                } else {
-                    action.customInset
-                }
-
-                var top = chain.args[1] as Int
-                var bottom = chain.args[3] as Int
-                if (action.isTop) {
-                    top = inset
-                } else {
-                    bottom = inset
-                }
-
-                return@intercept chain.proceed(
-                    arrayOf(chain.args[0], top, chain.args[2], bottom)
+            listOf("setPadding", "setPaddingRelative").forEach { methodName ->
+                val method = View::class.java.getDeclaredMethod(
+                    methodName,
+                    Int::class.javaPrimitiveType,
+                    Int::class.javaPrimitiveType,
+                    Int::class.javaPrimitiveType,
+                    Int::class.javaPrimitiveType
                 )
-            }
-
-            val setPaddingRelativeMethod = View::class.java.getDeclaredMethod(
-                "setPaddingRelative",
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType,
-                Int::class.javaPrimitiveType
-            )
-            hook(setPaddingRelativeMethod).intercept { chain ->
-                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
-                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
-                    ?: return@intercept chain.proceed()
-                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
-
-                val entryName = if (view.id != View.NO_ID) {
-                    runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
-                } else null
-
-                val isDecor = view === activity.window.decorView
-                val isDecorChild = view.parent === activity.window.decorView
-                val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
-
-                val action = pageConfig.extraActions.firstOrNull { act ->
-                    if (!act.isPadding) return@firstOrNull false
-                    if (act.viewId == "decor") {
-                        if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
-                    } else if (act.viewId == "content" || act.viewId == "android:id/content") {
-                        view.id == android.R.id.content
-                    } else {
-                        entryName != null && act.viewId == entryName
-                    }
-                } ?: return@intercept chain.proceed()
-
-                val inset = if (action.useSystemInsets) {
-                    if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
-                } else {
-                    action.customInset
+                hook(method).intercept { chain ->
+                    handlePaddingIntercept(chain)
                 }
-
-                var top = chain.args[1] as Int
-                var bottom = chain.args[3] as Int
-                if (action.isTop) {
-                    top = inset
-                } else {
-                    bottom = inset
-                }
-
-                return@intercept chain.proceed(
-                    arrayOf(chain.args[0], top, chain.args[2], bottom)
-                )
             }
 
             val setVisibilityMethod = View::class.java.getDeclaredMethod(
@@ -205,18 +107,7 @@ class ModuleMain : XposedModule() {
                 Int::class.javaPrimitiveType
             )
             hook(setVisibilityMethod).intercept { chain ->
-                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
-                if (view.id == View.NO_ID) return@intercept chain.proceed()
-                val entryName = runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
-                    ?: return@intercept chain.proceed()
-
-                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
-                    ?: return@intercept chain.proceed()
-                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
-                val action = pageConfig.extraActions.firstOrNull { it.isGone && it.viewId == entryName }
-                    ?: return@intercept chain.proceed()
-
-                return@intercept chain.proceed(arrayOf(View.GONE))
+                handleVisibilityIntercept(chain)
             }
 
             val setLayoutParamsMethod = View::class.java.getDeclaredMethod(
@@ -224,44 +115,7 @@ class ModuleMain : XposedModule() {
                 ViewGroup.LayoutParams::class.java
             )
             hook(setLayoutParamsMethod).intercept { chain ->
-                val view = chain.thisObject as? View ?: return@intercept chain.proceed()
-                val params = chain.args[0] as? ViewGroup.MarginLayoutParams ?: return@intercept chain.proceed()
-                val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
-                    ?: return@intercept chain.proceed()
-                val pageConfig = getPageConfig(activity) ?: return@intercept chain.proceed()
-
-                val entryName = if (view.id != View.NO_ID) {
-                    runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
-                } else null
-
-                val isDecor = view === activity.window.decorView
-                val isDecorChild = view.parent === activity.window.decorView
-                val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
-
-                val action = pageConfig.extraActions.firstOrNull { act ->
-                    if (act.isPadding || act.isGone) return@firstOrNull false
-                    if (act.viewId == "decor") {
-                        if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
-                    } else if (act.viewId == "content" || act.viewId == "android:id/content") {
-                        view.id == android.R.id.content
-                    } else {
-                        entryName != null && act.viewId == entryName
-                    }
-                } ?: return@intercept chain.proceed()
-
-                val inset = if (action.useSystemInsets) {
-                    if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
-                } else {
-                    action.customInset
-                }
-
-                if (action.isTop) {
-                    params.topMargin = inset
-                } else {
-                    params.bottomMargin = inset
-                }
-
-                return@intercept chain.proceed(arrayOf(params))
+                handleMarginIntercept(chain)
             }
         } catch (e: UnsupportedOperationException) {
             log(Log.INFO, TAG, "app config access failed", e)
@@ -350,11 +204,131 @@ class ModuleMain : XposedModule() {
         return null
     }
 
+    private fun handlePaddingIntercept(chain: XposedInterface.Chain): Any? {
+        val view = chain.thisObject as? View ?: return chain.proceed()
+        val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
+            ?: return chain.proceed()
+        val pageConfig = getPageConfigFast(activity) ?: return chain.proceed()
+
+        // Fast-Path: 如果页面无 Padding 规则直接放行
+        if (pageConfig.extraActions.isEmpty()) return chain.proceed()
+        val paddingActions = pageConfig.extraActions.filter { it.isPadding && !it.isGone }
+        if (paddingActions.isEmpty()) return chain.proceed()
+
+        val entryName = if (view.id != View.NO_ID) {
+            runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+        } else null
+
+        val isDecor = view === activity.window.decorView
+        val isDecorChild = view.parent === activity.window.decorView
+        val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
+
+        val action = paddingActions.firstOrNull { act ->
+            if (act.viewId == "decor") {
+                if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
+            } else if (act.viewId == "content" || act.viewId == "android:id/content") {
+                view.id == android.R.id.content
+            } else {
+                entryName != null && act.viewId == entryName
+            }
+        } ?: return chain.proceed()
+
+        val inset = if (action.useSystemInsets) {
+            if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
+        } else {
+            action.customInset
+        }
+
+        var top = chain.args[1] as Int
+        var bottom = chain.args[3] as Int
+        if (action.isTop) {
+            top = inset
+        } else {
+            bottom = inset
+        }
+
+        return chain.proceed(
+            arrayOf(chain.args[0], top, chain.args[2], bottom)
+        )
+    }
+
+    private fun handleVisibilityIntercept(chain: XposedInterface.Chain): Any? {
+        val view = chain.thisObject as? View ?: return chain.proceed()
+        val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
+            ?: return chain.proceed()
+        val pageConfig = getPageConfigFast(activity) ?: return chain.proceed()
+
+        // Fast-Path: 如果页面无 isGone 规则直接放行
+        if (pageConfig.extraActions.isEmpty()) return chain.proceed()
+        val goneActions = pageConfig.extraActions.filter { it.isGone }
+        if (goneActions.isEmpty()) return chain.proceed()
+
+        if (view.id == View.NO_ID) return chain.proceed()
+        val entryName = runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+            ?: return chain.proceed()
+
+        val action = goneActions.firstOrNull { it.viewId == entryName }
+            ?: return chain.proceed()
+
+        return chain.proceed(arrayOf(View.GONE))
+    }
+
+    private fun handleMarginIntercept(chain: XposedInterface.Chain): Any? {
+        val view = chain.thisObject as? View ?: return chain.proceed()
+        val params = chain.args[0] as? ViewGroup.MarginLayoutParams ?: return chain.proceed()
+        val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
+            ?: return chain.proceed()
+        val pageConfig = getPageConfigFast(activity) ?: return chain.proceed()
+
+        // Fast-Path: 如果页面无 Margin 规则直接放行
+        if (pageConfig.extraActions.isEmpty()) return chain.proceed()
+        val marginActions = pageConfig.extraActions.filter { !it.isPadding && !it.isGone }
+        if (marginActions.isEmpty()) return chain.proceed()
+
+        val entryName = if (view.id != View.NO_ID) {
+            runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+        } else null
+
+        val isDecor = view === activity.window.decorView
+        val isDecorChild = view.parent === activity.window.decorView
+        val decorChildIndex = if (isDecorChild) (view.parent as? ViewGroup)?.indexOfChild(view) else -1
+
+        val action = marginActions.firstOrNull { act ->
+            if (act.viewId == "decor") {
+                if (act.self) isDecor else (isDecorChild && act.childIndex == decorChildIndex)
+            } else if (act.viewId == "content" || act.viewId == "android:id/content") {
+                view.id == android.R.id.content
+            } else {
+                entryName != null && act.viewId == entryName
+            }
+        } ?: return chain.proceed()
+
+        val inset = if (action.useSystemInsets) {
+            if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
+        } else {
+            action.customInset
+        }
+
+        if (action.isTop) {
+            params.topMargin = inset
+        } else {
+            params.bottomMargin = inset
+        }
+
+        return chain.proceed(arrayOf(params))
+    }
+
+    private fun getPageConfigFast(activity: Activity): PageConfig? {
+        return activityConfigCache.getOrPut(activity) {
+            getPageConfig(activity)
+        }
+    }
+
     private fun doOnActivityCreated(chain: XposedInterface.Chain) {
         val activity = chain.thisObject as? Activity ?: return
         val window = activity.window
         log(Log.INFO, TAG, "Activity onCreate | ${activity.javaClass.name}")
-        val pageConfig = getPageConfig(activity) ?: return
+        val pageConfig = getPageConfigFast(activity) ?: return
         log(Log.INFO, TAG, "Activity ${activity.javaClass.name} config | $pageConfig")
         if (pageConfig.edgeToEdge) {
             pageConfig.windowBackgroundColor?.let {
@@ -486,10 +460,12 @@ class ModuleMain : XposedModule() {
             }
         }
 
-        Task.onMain(1000) {
-            log(Log.INFO, TAG, "=== View Hierarchy Dump for ${activity.javaClass.name} ===")
-            dumpViewHierarchy(window.decorView)
-            log(Log.INFO, TAG, "=== End of Dump for ${activity.javaClass.name} ===")
+        if (BuildConfig.DEBUG) {
+            Task.onMain(1000) {
+                log(Log.INFO, TAG, "=== View Hierarchy Dump for ${activity.javaClass.name} ===")
+                dumpViewHierarchy(window.decorView)
+                log(Log.INFO, TAG, "=== End of Dump for ${activity.javaClass.name} ===")
+            }
         }
     }
 
