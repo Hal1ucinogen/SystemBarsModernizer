@@ -10,7 +10,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-purple.svg?style=flat-square)](https://kotlinlang.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](LICENSE)
 
-[English](#features) • [简体中文](#-项目简介) • [配置文档](#-规则配置与-extraaction-引擎) • [预设规则](#-内置适配应用)
+[English](#features) • [简体中文](#-项目简介) • [配置文档](#-规则配置与-extraaction-引擎) • [免责声明](#️-免责声明-disclaimer)
 
 ---
 
@@ -18,7 +18,7 @@
 
 ## 📖 项目简介
 
-在现代 Android 系统（特别是 Android 10+ 的手势导航时代）中，许多主流国内应用依然保留着传统的黑底导航栏、生硬的状态栏垫高（Padding）或者自定义的底部占位 View（如 72px 导航占位条），破坏了全面屏的无缝视觉体验。
+在现代 Android 系统（特别是 Android 10+ 的手势导航时代）中，许多第三方应用依然保留着传统的黑底导航栏、生硬的状态栏垫高（Padding）或者自定义的底部占位 View（如 72px 导航占位条），破坏了全面屏的无缝视觉体验。
 
 **SystemBarsModernizer (SBM)** 是一个基于现代化 **LibXposed (API 102)** 标准构建的高性能 Xposed 模块。它通过在系统框架层与视图层进行精准拦截与参数改写，为各类应用强制启用 **Edge-to-Edge 边到边沉浸式渲染**，并提供细粒度的布局边距矫正引擎，彻底消除黑条、切边与多余垫高。
 
@@ -33,12 +33,12 @@
 - 🛠️ **强大的 ExtraAction 布局矫正引擎**：
   - **Padding（内边距）矫正**：动态重置或注入顶部状态栏/底部导航栏 Insets；
   - **Margin（外边距）矫正**：动态拦截 `View.setLayoutParams`，精准改写子容器的 `topMargin` / `bottomMargin`；
-  - **占位 View 消除（`isGone`）**：锁定指定占位 View（如 `v_navbar_placeholder`）为 `View.GONE` 且高度归零；
+  - **占位 View 消除（`isGone`）**：锁定指定占位 View 为 `View.GONE` 且高度归零；
   - **DecorView 索引定位（`viewId = "decor"`）**：支持定位未命名的 DecorView 子容器（如 `decorView.getChildAt(0)`）。
 - 🔍 **4 级智能页面匹配体系**：
-  1. **精确类名匹配**：`scope["com.xxx.MainActivity"]`
-  2. **`$` 内部类/影子 Activity 向上继承**：`XRiverActivity$App01` 自动继承 `XRiverActivity` 的规则
-  3. **`*` 前缀通配符批量匹配**：`"com.alipay.android.phone.msgboxapp.ui.activity.*"`
+  1. **精确类名匹配**：`scope["com.example.MainActivity"]`
+  2. **`$` 内部类/影子 Activity 向上继承**：`SubActivity$Child01` 自动继承 `SubActivity` 的规则
+  3. **`*` 前缀通配符批量匹配**：`"com.example.feature.ui.*"`
   4. **通用兜底规则与排除列表（`exclusive`）**
 - ⚡ **极致性能与零开销架构**：
   - `WeakHashMap<Activity, PageConfig?>` 弱引用缓存，页面配置 O(1) 内存直取；
@@ -93,7 +93,7 @@ data class PageConfig(
 )
 ```
 
-### 2. `ExtraAction` 结构与常用场景
+### 2. `ExtraAction` 结构与典型场景
 
 ```kotlin
 data class ExtraAction(
@@ -109,39 +109,26 @@ data class ExtraAction(
 )
 ```
 
-#### 常见配置示例：
+#### 常见场景配置范式：
 
-- **场景 A：清空特定 View 的底部 Padding**
+- **场景 1：清空特定容器 View 的底部 Padding（解决 Web/Hybrid 容器底部留白）**
   ```kotlin
-  ExtraAction(viewId = "nebulax_root_view", isTop = false, isPadding = true, customInset = 0)
+  ExtraAction(viewId = "web_root_container", isTop = false, isPadding = true, customInset = 0)
   ```
-- **场景 B：清空 DecorView 第 0 个子容器的底部 Margin（如淘宝详情页）**
+- **场景 2：清空 DecorView 第 0 个子容器的底部 Margin（解决多层容器嵌套下的黑底）**
   ```kotlin
   ExtraAction(viewId = "decor", isGroup = true, self = false, childIndex = 0, isTop = false, isPadding = false, customInset = 0)
   ```
-- **场景 C：隐藏多余的导航栏占位 View（如支付宝消息中心）**
+- **场景 3：隐藏硬编码的导航栏占位 View（解决底部多余的空白占位条）**
   ```kotlin
-  ExtraAction(viewId = "v_navbar_placeholder", isGone = true)
+  ExtraAction(viewId = "nav_placeholder_view", isGone = true)
   ```
-
----
-
-## 📱 内置适配应用（部分展示）
-
-| 应用名称 | 包名 | 适配页面 / 规则 | 说明 |
-| :--- | :--- | :--- | :--- |
-| **淘宝** | `com.taobao.taobao` | `TBMainActivity`<br>`NewDetailActivity` | 首页纯白导航栏；商品详情页清空 DecorView 子容器 `bottomMargin` 消除底部黑条 |
-| **支付宝** | `com.eg.android.AlipayGphone` | `XRiverActivity` (小程序/H5)<br>`CSPushActivity` (推送卡片)<br>`ContactMainPageActivity` (通讯录)<br>`com.alipay.android.phone.msgboxapp.ui.activity.*` | 消除 H5 根布局 padding、清空 DecorView 容器底边距、隐藏所有消息盒子页面的 `v_navbar_placeholder` 占位块 |
-| **闲鱼** | `com.taobao.idlefish` | 通用边到边 | 全局页面强制开启沉浸式边到边 |
-| **京东** | `com.jingdong.app.mall` | 通用边到边 (排除商品详情及结算页) | 避免特殊悬浮结算页变形，其余页面全沉浸 |
-| **小黑盒** | `com.max.xiaoheihe` | `MainActivity`<br>`ChannelsDetailActivity`<br>`WebActionActivity` | 适配浅色/深色主题动态切色，文章页全沉浸 |
-| **豆瓣** | `com.douban.frodo` | 通用边到边 | 统一现代化导航条底色 |
 
 ---
 
 ## 🗺️ 路线图与规划（Roadmap & TODO）
 
-目前项目的核心 Hook 引擎与规则执行体系已完全就绪，但当前的规则配置仍以代码预设与调试配置为主。管理端 App 的可视化与动态管理能力正在积极重构中：
+目前项目的核心 Hook 引擎与规则执行体系已完全就绪，管理端 App 的可视化与动态管理能力正在积极重构中：
 
 - [ ] **应用列表可视化（App List）**：
   - 扫描并展示设备上已安装的全部第三方与系统应用；
@@ -169,7 +156,7 @@ data class ExtraAction(
 ### 使用步骤
 1. 在 [Releases](../../releases) 中下载最新的 APK 并安装；
 2. 打开 LSPosed 管理器，在模块列表中勾选 **SystemBarsModernizer** 并启用；
-3. 选择需要生效的目标应用作用域（如淘宝、支付宝、微信等）；
+3. 选择需要生效的目标应用作用域；
 4. 强行停止目标应用后重新打开，即可享受丝滑的边到边沉浸式体验。
 
 ---
@@ -193,6 +180,15 @@ cd SystemBarsModernizer
 构建生成的 APK 位于：
 * `app/build/outputs/apk/debug/app-debug.apk`
 * `app/build/outputs/apk/release/app-release-unsigned.apk`
+
+---
+
+## ⚠️ 免责声明 (Disclaimer)
+
+1. **用途限制**：本项目（SystemBarsModernizer）仅用于 Android 视图系统（View System）与边到边沉浸式（Edge-to-Edge）渲染技术的学习、研究与个人视觉体验优化。
+2. **实现原理**：本项目仅在用户已取得 Root/框架授权的本地设备内存（RAM）中，通过公开的系统视图接口对视图边距和系统栏颜色进行运行时局部调整。**本项目不包含任何破解、反编译、逆向工程或重新分发第三方应用程序 APK 原文件的行为，亦不篡改任何应用程序的业务逻辑、数据通信与安全机制。**
+3. **商标与版权**：文档与代码中提及的所有第三方应用名称、包名及商标，其知识产权与商标权均归其各自的合法所有者所有，仅作为兼容性技术参考，与本项目作者无任何商业关联。
+4. **使用风险**：用户需自行承担使用 Xposed 模块的相关风险，作者不对因使用本软件造成的任何直接或间接影响承担法律责任。
 
 ---
 
