@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidX.core)
 //    implementation(libs.androidX.appCompat)
     implementation(libs.androidX.fragment)
+    implementation(libs.androidX.preference)
     implementation(libs.google.material)
     implementation(libs.coil)
     implementation(libs.bundles.androidX.lifecycle)

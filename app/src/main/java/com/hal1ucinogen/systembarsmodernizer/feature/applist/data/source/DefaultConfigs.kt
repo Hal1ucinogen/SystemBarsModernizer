@@ -45,10 +45,43 @@ object DefaultConfigs {
         // 淘宝
         AppConfig(
             "com.taobao.taobao",
-            1, 
+            1,
             mapOf(
-                "com.taobao.tao.TBMainActivity" to PageConfig(navigationColor = Color.TRANSPARENT, windowBackgroundColor = Color.WHITE),
+                "com.taobao.tao.welcome.Welcome" to PageConfig(
+                    navigationColor = Color.TRANSPARENT,
+                    windowBackgroundColor = Color.WHITE
+                ),
+                "com.taobao.themis.container.app.TMSActivity" to PageConfig(
+                    edgeToEdge = true,
+                    extraActions = listOf(
+                        ExtraAction(
+                            viewId = "decor",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 0,
+                            isTop = false,
+                            isPadding = false,
+                            useSystemInsets = false,
+                            customInset = 0
+                        )
+                    )
+                ),
                 "com.taobao.android.detail2.core.framework.NewDetailActivity" to PageConfig(
+                    edgeToEdge = true,
+                    extraActions = listOf(
+                        ExtraAction(
+                            viewId = "decor",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 0,
+                            isTop = false,
+                            isPadding = false,
+                            useSystemInsets = false,
+                            customInset = 0
+                        )
+                    )
+                ),
+                "com.taobao.weex.weexv2.page.WeexV2Activity" to PageConfig(
                     edgeToEdge = true,
                     extraActions = listOf(
                         ExtraAction(
@@ -64,7 +97,13 @@ object DefaultConfigs {
                     )
                 )
             ),
-            general = GeneralConfig(PageConfig(edgeToEdge = true))
+            general = GeneralConfig(
+                PageConfig(edgeToEdge = true),
+                exclusive = listOf(
+                    "com.taobao.android.detail.alittdetail.TTDetailActivity",
+                    "com.taobao.android.purchase.aura.TBBuyActivity"
+                )
+            )
         ),
         // 电笠
         AppConfig("media.dl", 1, emptyMap(), general = GeneralConfig(PageConfig(edgeToEdge = true))),
@@ -180,9 +219,18 @@ object DefaultConfigs {
                             customInset = 0
                         )
                     )
+                ),
+                "com.alipay.mobile.chatapp.ui.PersonalChatMsgActivity_" to PageConfig(
+                    navigationColor = Color.WHITE,
+                    windowBackgroundColor = Color.WHITE
                 )
             ),
-            general = GeneralConfig(PageConfig(edgeToEdge = true))
+            general = GeneralConfig(
+                PageConfig(edgeToEdge = true),
+                exclusive = listOf(
+                    "com.eg.android.AlipayGphone.AlipayLogin"
+                )
+            )
         )
     )
 }

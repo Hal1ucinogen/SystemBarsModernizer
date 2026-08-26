@@ -87,4 +87,39 @@
     <string name="dialog_discard_message">You have unsaved changes. Are you sure you want to discard them?</string>
     <string name="action_discard">Discard</string>
     <string name="action_keep_editing">Keep Editing</string>
+    
+    <!-- Settings Screen -->
+    <string name="pref_category_rules">Rules &amp; Synchronization</string>
+    <string name="pref_force_sync_title">Force Sync to LSPosed</string>
+    <string name="pref_force_sync_summary">Re-push all configured application rules to LSPosed framework</string>
+    <string name="pref_export_rules_title">Export Rules Backup</string>
+    <string name="pref_export_rules_summary">Export all application configurations to a JSON file</string>
+    <string name="pref_import_rules_title">Import Rules Backup</string>
+    <string name="pref_import_rules_summary">Restore application configurations from a JSON file</string>
+    <string name="pref_reset_all_rules_title">Clear All Rules</string>
+    <string name="pref_reset_all_rules_summary">Delete all application configurations permanently</string>
+    
+    <string name="dialog_reset_all_title">Clear All Configurations?</string>
+    <string name="dialog_reset_all_message">This will permanently delete all customized rules for all applications. This action cannot be undone.</string>
+    <string name="action_clear">Clear</string>
+
+    <string name="pref_category_appearance">Appearance</string>
+    <string name="pref_dark_mode_title">Dark Mode</string>
+    <string name="dark_mode_follow_system">Follow System</string>
+    <string name="dark_mode_light">Light</string>
+    <string name="dark_mode_dark">Dark</string>
+
+    <string name="pref_category_about">About</string>
+    <string name="pref_version_title">Version</string>
+    <string name="pref_github_title">GitHub Repository</string>
+    <string name="pref_github_summary">Open source repository on GitHub</string>
+    <string name="pref_license_title">License</string>
+    <string name="pref_license_summary">Apache License 2.0</string>
+
+    <string name="msg_sync_success">Successfully synced %1$d app configurations to LSPosed</string>
+    <string name="msg_export_success">Rules exported successfully</string>
+    <string name="msg_export_failed">Failed to export rules: %1$s</string>
+    <string name="msg_import_success">Successfully imported %1$d app configurations</string>
+    <string name="msg_import_failed">Failed to import rules: %1$s</string>
+    <string name="msg_reset_all_success">All rules cleared successfully</string>
 </resources>
