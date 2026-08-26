@@ -122,4 +122,25 @@
     <string name="msg_import_success">Successfully imported %1$d app configurations</string>
     <string name="msg_import_failed">Failed to import rules: %1$s</string>
     <string name="msg_reset_all_success">All rules cleared successfully</string>
+    
+    <!-- Overview Screen -->
+    <string name="overview_framework_connected">Framework Connected</string>
+    <string name="overview_framework_not_activated">Module Not Activated</string>
+    <string name="overview_framework_not_activated_desc">SystemBarsModernizer is not active. Please enable this module in LSPosed manager and reboot or restart target apps.</string>
+    <string name="overview_scope_count">Scope: %1$d apps</string>
+    <string name="overview_section_stats">Configuration Statistics</string>
+    <string name="overview_stat_configured_apps">Configured Apps</string>
+    <string name="overview_stat_scope_rules">Page Rules</string>
+    <string name="overview_stat_global_e2e">Global Edge-to-Edge</string>
+    <string name="overview_stat_extra_actions">Extra View Actions</string>
+    <string name="overview_section_guide">Quick Guide</string>
+    <string name="overview_btn_view_app_list">View App Rules</string>
+    <string name="overview_guide_step1">1. Select a target application from the App List.</string>
+    <string name="overview_guide_step2">2. Enable Global Edge-to-Edge or fine-tune page-specific View insets.</string>
+    <string name="overview_guide_step3">3. Save rules, then force stop and restart the target app to apply changes.</string>
+    
+    <!-- Scope List Dialog -->
+    <string name="scope_dialog_title">Active Scope</string>
+    <string name="scope_dialog_count">(%1$d)</string>
+    <string name="scope_dialog_empty">No applications currently in scope</string>
 </resources>
