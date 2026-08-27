@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">SystemBarsModernizer</string>
-    <string name="app_desc">Modernize your system bars</string>
+    <string name="app_name">Edgefitter</string>
+    <string name="app_desc">Fit your system bars to the edge</string>
 
     <string name="title_app_list">Apps</string>
     <string name="title_overview">Overview</string>
@@ -126,7 +126,7 @@
     <!-- Overview Screen -->
     <string name="overview_framework_connected">Framework Connected</string>
     <string name="overview_framework_not_activated">Module Not Activated</string>
-    <string name="overview_framework_not_activated_desc">SystemBarsModernizer is not active. Please enable this module in LSPosed manager and reboot or restart target apps.</string>
+    <string name="overview_framework_not_activated_desc">Edgefitter is not active. Please enable this module in LSPosed manager and reboot or restart target apps.</string>
     <string name="overview_scope_count">Scope: %1$d apps</string>
     <string name="overview_section_stats">Configuration Statistics</string>
     <string name="overview_stat_configured_apps">Configured Apps</string>

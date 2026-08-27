@@ -1,6 +1,8 @@
 <div align="center">
 
-# SystemBarsModernizer (SBM)
+# Edgefitter
+
+> *Formerly **SystemBarsModernizer***
 
 **让 Android 应用拥抱真·边到边（Edge-to-Edge）现代化系统栏体验**
 
@@ -20,7 +22,7 @@
 
 在现代 Android 系统（特别是 Android 10+ 的手势导航时代）中，许多第三方应用依然保留着传统的黑底导航栏、生硬的状态栏垫高（Padding）或者自定义的底部占位 View（如 72px 导航占位条），破坏了全面屏的无缝视觉体验。
 
-**SystemBarsModernizer (SBM)** 是一个基于现代化 **LibXposed (API 102)** 标准构建的高性能 Xposed 模块。它通过在系统框架层与视图层进行精准拦截与参数改写，为各类应用强制启用 **Edge-to-Edge 边到边渲染**，并提供细粒度的布局边距矫正引擎，彻底消除黑条、切边与多余垫高。
+**Edgefitter**（曾用名 *SystemBarsModernizer*）是一个基于现代化 **LibXposed (API 102)** 标准构建的高性能 Xposed 模块。它通过在系统框架层与视图层进行精准拦截与参数改写，为各类应用强制启用 **Edge-to-Edge 边到边渲染**，并提供细粒度的布局边距矫正引擎，彻底消除黑条、切边与多余垫高。
 
 ---
 
@@ -77,7 +79,7 @@
 
 ## ⚙️ 规则配置与 ExtraAction 引擎
 
-SBM 采用结构化的数据模型描述每个应用和页面的边到边行为：
+Edgefitter 采用结构化的数据模型描述每个应用和页面的边到边行为：
 
 ### 1. `PageConfig` 结构说明
 
@@ -155,7 +157,7 @@ data class ExtraAction(
 
 ### 使用步骤
 1. 在 [Releases](../../releases) 中下载最新的 APK 并安装；
-2. 打开 LSPosed 管理器，在模块列表中勾选 **SystemBarsModernizer** 并启用；
+2. 打开 LSPosed 管理器，在模块列表中勾选 **Edgefitter** 并启用；
 3. 选择需要生效的目标应用作用域；
 4. 强行停止目标应用后重新打开，即可享受丝滑的边到边体验。
 
@@ -185,7 +187,7 @@ cd SystemBarsModernizer
 
 ## ⚠️ 免责声明 (Disclaimer)
 
-1. **用途限制**：本项目（SystemBarsModernizer）仅用于 Android 视图系统（View System）与边到边（Edge-to-Edge）渲染技术的学习、研究与个人视觉体验优化。
+1. **用途限制**：本项目（Edgefitter，曾用名 *SystemBarsModernizer*）仅用于 Android 视图系统（View System）与边到边（Edge-to-Edge）渲染技术的学习、研究与个人视觉体验优化。
 2. **实现原理**：本项目仅在用户已取得 Root/框架授权的本地设备内存（RAM）中，通过公开的系统视图接口对视图边距和系统栏颜色进行运行时局部调整。**本项目不包含任何破解、反编译、逆向工程或重新分发第三方应用程序 APK 原文件的行为，亦不篡改任何应用程序的业务逻辑、数据通信与安全机制。**
 3. **商标与版权**：文档与代码中提及的所有第三方应用名称、包名及商标，其知识产权与商标权均归其各自的合法所有者所有，仅作为兼容性技术参考，与本项目作者无任何商业关联。
 4. **使用风险**：用户需自行承担使用 Xposed 模块的相关风险，作者不对因使用本软件造成的任何直接或间接影响承担法律责任。

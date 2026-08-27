@@ -38,7 +38,7 @@ import kotlinx.serialization.json.Json
 class ModuleMain : XposedModule() {
 
     companion object {
-        const val TAG = "SystemBarsModernizer"
+        const val TAG = "Edgefitter"
     }
 
     val configMap = mutableMapOf<String, AppConfig>()
