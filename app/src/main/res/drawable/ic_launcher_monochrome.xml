@@ -10,13 +10,13 @@
         android:fillColor="#00000000"
         android:pathData="M54,26.5 L54,21.5"
         android:strokeWidth="2.0"
-        android:strokeColor="#85E8C8"
+        android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
     <path
         android:fillColor="#00000000"
         android:pathData="M50,24.5 L54,21 L58,24.5"
         android:strokeWidth="2.0"
-        android:strokeColor="#85E8C8"
+        android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 
@@ -25,20 +25,22 @@
         android:fillColor="#00000000"
         android:pathData="M54,81.5 L54,86.5"
         android:strokeWidth="2.0"
-        android:strokeColor="#85E8C8"
+        android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
     <path
         android:fillColor="#00000000"
         android:pathData="M50,83.5 L54,87 L58,83.5"
         android:strokeWidth="2.0"
-        android:strokeColor="#85E8C8"
+        android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 
-    <!-- 3. 中央手机画板 (3:4 比例，宽 38dp 高 50dp，圆角 8dp，严格在安全区内) -->
+    <!-- 3. 中央手机画板轮廓 (3:4 垂直手机单色线框，宽 38dp 高 50dp，圆角 8dp) -->
     <path
-        android:fillColor="#00B86B"
-        android:pathData="M43,29 h22 a8,8 0 0 1 8,8 v34 a8,8 0 0 1 -8,8 h-22 a8,8 0 0 1 -8,-8 v-34 a8,8 0 0 1 8,-8 z" />
+        android:fillColor="#00000000"
+        android:pathData="M43,29 h22 a8,8 0 0 1 8,8 v34 a8,8 0 0 1 -8,8 h-22 a8,8 0 0 1 -8,-8 v-34 a8,8 0 0 1 8,-8 z"
+        android:strokeWidth="2.0"
+        android:strokeColor="#FFFFFF" />
 
     <!-- 4. 中央官方标准 Android 机器人头部 (Bugdroid，等比缩放居中) -->
     <group
@@ -61,3 +63,6 @@
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
 </vector>
+
+
+
