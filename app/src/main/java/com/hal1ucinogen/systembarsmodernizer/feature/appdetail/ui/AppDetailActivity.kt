@@ -2,8 +2,6 @@ package com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -155,7 +153,7 @@ class AppDetailActivity : BaseActivity<ActivityAppDetailBinding>() {
                     // 4. Extra Actions Badge
                     if (general.config.extraActions.isNotEmpty()) {
                         val actionsChip = Chip(this).apply {
-                            text = "动作: ${general.config.extraActions.size}"
+                            text = "ExtraActions: ${general.config.extraActions.size}"
                             isEnabled = false
                         }
                         binding.chipGroupGeneralBadges.addView(actionsChip)

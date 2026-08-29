@@ -1,0 +1,153 @@
+<resources>
+    <string name="app_name">Edgefitter</string>
+    <string name="app_desc">让系统栏拥抱真正的边到边体验</string>
+
+    <string name="title_app_list">应用</string>
+    <string name="title_overview">概览</string>
+    <string name="title_settings">设置</string>
+
+    <string name="empty_list">列表为空</string>
+    <string name="action_search">搜索</string>
+    <string name="action_filter">筛选</string>
+    <string name="filter_all">全部应用</string>
+    <string name="filter_configured_only">仅已配置</string>
+    <string name="filter_user_only">仅用户应用</string>
+    <string name="filter_system_only">仅系统应用</string>
+    <string name="action_refresh">刷新列表</string>
+
+    <!-- App List Badges -->
+    <string name="badge_uninstalled">已卸载</string>
+    <string name="badge_system">系统</string>
+    <string name="badge_global_edge_to_edge">全局边到边</string>
+    <string name="badge_global_with_pages">全局 + %1$d 页</string>
+    <string name="badge_scope_configs">配置 (%1$d)</string>
+
+    <!-- App Detail -->
+    <string name="title_app_detail">应用配置</string>
+    <string name="empty_config_title">暂无配置</string>
+    <string name="empty_config_desc">创建配置以开启边到边、排除黑名单页面及进行细粒度的页面视图调整。</string>
+    <string name="btn_create_config">创建配置</string>
+
+    <string name="section_general_config">通用配置</string>
+    <string name="desc_general_config">应用于整个应用的全局配置（排除页面除外）。</string>
+    <string name="no_general_config">未启用通用配置</string>
+    <string name="desc_no_general_config">该应用仅依赖特定页面规则或系统默认表现。</string>
+    <string name="switch_enable_general">启用通用配置</string>
+    <string name="switch_global_edge_to_edge">边到边</string>
+    <string name="btn_edit_general_page_config">编辑通用属性</string>
+    <string name="exclusive_activities">排除的页面</string>
+    <string name="btn_add_exclusive">添加排除页面</string>
+    <string name="no_exclusive_activities">暂无排除页面</string>
+    
+    <string name="section_scope_config">特定页面配置 (Scope)</string>
+    <string name="desc_scope_config">针对特定 Activity 的独立配置与自定义视图调整。</string>
+    <string name="btn_add_scope_rule">添加页面配置</string>
+    <string name="no_scope_rules">暂无特定页面配置</string>
+    
+    <string name="action_reset_default">重置为默认</string>
+    <string name="action_clear_config">清空配置</string>
+    <string name="action_save">保存</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_delete">删除</string>
+    <string name="action_edit">编辑</string>
+    
+    <string name="dialog_title_pick_activity">选择 Activity</string>
+    <string name="hint_search_activity">搜索 Activity 或输入通配符...</string>
+    <string name="btn_custom_activity">使用自定义/通配符</string>
+    
+    <string name="dialog_title_page_config">编辑页面配置</string>
+    <string name="dialog_title_page_config_detail">页面配置详情</string>
+    <string name="field_activity_name">Activity / 规则模式</string>
+    <string name="switch_edge_to_edge">边到边</string>
+    <string name="switch_clear_translucent">清除半透明标记</string>
+    <string name="field_window_bg_color">窗口背景颜色</string>
+    <string name="section_extra_actions">附加视图动作 (ExtraAction)</string>
+    <string name="btn_add_extra_action">添加视图动作</string>
+    <string name="no_extra_actions">暂无附加视图动作</string>
+    
+    <string name="dialog_title_extra_action">编辑视图动作</string>
+    <string name="field_view_id">视图 ID / 目标</string>
+    <string name="hint_view_id">例如 decor、content 或资源 ID</string>
+    <string name="action_type">动作类型</string>
+    <string name="action_type_padding">调整内边距 (Padding)</string>
+    <string name="action_type_margin">调整外边距 (Margin)</string>
+    <string name="action_type_gone">隐藏视图 (GONE)</string>
+    <string name="target_bar">目标系统栏</string>
+    <string name="target_bar_status">顶部（状态栏）</string>
+    <string name="target_bar_nav">底部（导航栏）</string>
+    <string name="switch_use_system_insets">使用系统栏高度</string>
+    <string name="field_custom_inset">自定义边距 (px)</string>
+    <string name="switch_is_group">目标为 ViewGroup</string>
+    <string name="switch_self">作用于自身</string>
+    <string name="field_child_index">子 View 索引（-1 为无/全选）</string>
+    
+    <string name="msg_config_saved">配置已保存并同步推送至 LSPosed</string>
+    <string name="msg_config_reset">配置已重置为默认</string>
+    <string name="msg_config_cleared">配置已清空</string>
+    
+    <!-- Config Edit & Detail Actions -->
+    <string name="title_app_config_edit">编辑配置</string>
+    <string name="btn_edit_config">编辑配置</string>
+    <string name="state_global_e2e_enabled">边到边：已启用</string>
+    <string name="state_global_e2e_disabled">边到边：已禁用</string>
+    <string name="dialog_discard_title">放弃更改？</string>
+    <string name="dialog_discard_message">您有未保存的修改，确定要放弃吗？</string>
+    <string name="action_discard">放弃</string>
+    <string name="action_keep_editing">继续编辑</string>
+    
+    <!-- Settings Screen -->
+    <string name="pref_category_configs">配置管理与同步</string>
+    <string name="pref_force_sync_title">强制同步到 LSPosed</string>
+    <string name="pref_force_sync_summary">重新将所有应用配置推送到 LSPosed 框架</string>
+    <string name="pref_export_configs_title">导出配置备份</string>
+    <string name="pref_export_configs_summary">将所有应用配置导出为 JSON 文件</string>
+    <string name="pref_import_configs_title">导入配置备份</string>
+    <string name="pref_import_configs_summary">从 JSON 文件恢复应用配置</string>
+    <string name="pref_reset_all_configs_title">清空全部配置</string>
+    <string name="pref_reset_all_configs_summary">永久删除所有应用的自定义配置</string>
+    
+    <string name="dialog_reset_all_title">清空全部配置？</string>
+    <string name="dialog_reset_all_message">此操作将永久清除所有应用的自定义配置且无法撤销。</string>
+    <string name="action_clear">清空</string>
+
+    <string name="pref_category_appearance">外观</string>
+    <string name="pref_dark_mode_title">深色模式</string>
+    <string name="dark_mode_follow_system">跟随系统</string>
+    <string name="dark_mode_light">浅色模式</string>
+    <string name="dark_mode_dark">深色模式</string>
+
+    <string name="pref_category_about">关于</string>
+    <string name="pref_version_title">版本</string>
+    <string name="pref_github_title">GitHub 仓库</string>
+    <string name="pref_github_summary">GitHub 开源仓库主页</string>
+    <string name="pref_license_title">开源协议</string>
+    <string name="pref_license_summary">Apache License 2.0</string>
+
+    <string name="msg_sync_success">已成功同步 %1$d 个应用配置到 LSPosed</string>
+    <string name="msg_export_success">配置导出成功</string>
+    <string name="msg_export_failed">导出配置失败: %1$s</string>
+    <string name="msg_import_success">已成功导入 %1$d 个应用配置</string>
+    <string name="msg_import_failed">导入配置失败: %1$s</string>
+    <string name="msg_reset_all_success">已成功清空所有配置</string>
+    
+    <!-- Overview Screen -->
+    <string name="overview_framework_connected">框架已连接</string>
+    <string name="overview_framework_not_activated">模块未激活</string>
+    <string name="overview_framework_not_activated_desc">Edgefitter 尚未激活。请在 LSPosed 管理器中启用本模块并重启系统或目标应用。</string>
+    <string name="overview_scope_count">已生效作用域: %1$d 个应用</string>
+    <string name="overview_section_stats">配置统计</string>
+    <string name="overview_stat_configured_apps">已配置应用</string>
+    <string name="overview_stat_scope_rules">页面规则数</string>
+    <string name="overview_stat_global_e2e">全局边到边</string>
+    <string name="overview_stat_extra_actions">附加视图动作</string>
+    <string name="overview_section_guide">快速上手</string>
+    <string name="overview_btn_view_app_list">查看应用配置</string>
+    <string name="overview_guide_step1">1. 在应用列表中选择需要配置的目标应用。</string>
+    <string name="overview_guide_step2">2. 开启全局边到边或针对特定页面调整视图边距。</string>
+    <string name="overview_guide_step3">3. 保存配置后，强行停止并重新打开目标应用以使更改生效。</string>
+    
+    <!-- Scope List Dialog -->
+    <string name="scope_dialog_title">生效作用域列表</string>
+    <string name="scope_dialog_count">(%1$d)</string>
+    <string name="scope_dialog_empty">当前作用域内暂无应用</string>
+</resources>

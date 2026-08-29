@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 
 data class OverviewStats(
     val configuredAppsCount: Int = 0,
-    val totalScopeRulesCount: Int = 0,
+    val totalScopeConfigsCount: Int = 0,
     val globalE2eAppsCount: Int = 0,
     val totalExtraActionsCount: Int = 0
 )
@@ -18,7 +18,7 @@ class OverviewViewModel(
 
     val stats = sbmItemDao.getAllItems().map { items ->
         var configuredApps = 0
-        var totalScopeRules = 0
+        var totalScopeConfigs = 0
         var globalE2eApps = 0
         var totalExtraActions = 0
 
@@ -35,7 +35,7 @@ class OverviewViewModel(
                 globalE2eApps++
             }
 
-            totalScopeRules += config.scope.size
+            totalScopeConfigs += config.scope.size
 
             // Count general extra actions
             config.general?.config?.extraActions?.let {
@@ -50,7 +50,7 @@ class OverviewViewModel(
 
         OverviewStats(
             configuredAppsCount = configuredApps,
-            totalScopeRulesCount = totalScopeRules,
+            totalScopeConfigsCount = totalScopeConfigs,
             globalE2eAppsCount = globalE2eApps,
             totalExtraActionsCount = totalExtraActions
         )

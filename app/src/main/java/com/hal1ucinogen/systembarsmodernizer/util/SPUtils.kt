@@ -12,13 +12,14 @@ object SPUtils {
     }
 
     fun <T> getValue(name: String, default: T): T = with(sp) {
-        val res: Any = when (default) {
+        val res: Any? = when (default) {
             is Long -> getLong(name, default)
-            is String -> getString(name, default).orEmpty()
+            is String -> getString(name, default) ?: default
             is Int -> getInt(name, default)
             is Boolean -> getBoolean(name, default)
             is Float -> getFloat(name, default)
-            else -> throw java.lang.IllegalArgumentException()
+            null -> getString(name, null)
+            else -> throw java.lang.IllegalArgumentException("Unsupported type: ${default?.let { it::class.java }}")
         }
         @Suppress("UNCHECKED_CAST")
         res as T
@@ -31,6 +32,7 @@ object SPUtils {
             is Int -> putInt(name, value)
             is Boolean -> putBoolean(name, value)
             is Float -> putFloat(name, value)
+            null -> remove(name)
             else -> throw IllegalArgumentException("This type can't be saved into Preferences")
         }.apply()
     }

@@ -15,27 +15,34 @@
     <string name="filter_system_only">System Apps Only</string>
     <string name="action_refresh">Refresh List</string>
 
+    <!-- App List Badges -->
+    <string name="badge_uninstalled">Uninstalled</string>
+    <string name="badge_system">System</string>
+    <string name="badge_global_edge_to_edge">Edge-to-Edge</string>
+    <string name="badge_global_with_pages">Global + %1$d Pages</string>
+    <string name="badge_scope_configs">Configs (%1$d)</string>
+
     <!-- App Detail -->
     <string name="title_app_detail">App Configuration</string>
     <string name="empty_config_title">No Configuration Available</string>
     <string name="empty_config_desc">Create a configuration to enable Edge-to-Edge, blacklist exclusions, and advanced page-level adjustments.</string>
     <string name="btn_create_config">Create Configuration</string>
 
-    <string name="section_general_config">General Rules</string>
-    <string name="desc_general_config">Global rules applied across the entire app, except excluded pages.</string>
-    <string name="no_general_config">No General Rules Configured</string>
-    <string name="desc_no_general_config">This app relies solely on page-specific rules or system defaults.</string>
-    <string name="switch_enable_general">Enable General Rules</string>
+    <string name="section_general_config">General Configuration</string>
+    <string name="desc_general_config">Global configuration applied across the entire app, except excluded pages.</string>
+    <string name="no_general_config">No General Configuration</string>
+    <string name="desc_no_general_config">This app relies solely on page-specific configurations or system defaults.</string>
+    <string name="switch_enable_general">Enable General Configuration</string>
     <string name="switch_global_edge_to_edge">Edge-to-Edge</string>
     <string name="btn_edit_general_page_config">Edit General Properties</string>
     <string name="exclusive_activities">Excluded Activities</string>
     <string name="btn_add_exclusive">Add Excluded Page</string>
     <string name="no_exclusive_activities">No excluded activities</string>
     
-    <string name="section_scope_config">Page-Specific Rules (Scope)</string>
-    <string name="desc_scope_config">Specific rules and custom adjustments for individual Activities.</string>
-    <string name="btn_add_scope_rule">Add Page Rule</string>
-    <string name="no_scope_rules">No page-specific rules</string>
+    <string name="section_scope_config">Page-Specific Configurations (Scope)</string>
+    <string name="desc_scope_config">Specific configurations and custom adjustments for individual Activities.</string>
+    <string name="btn_add_scope_rule">Add Page Configuration</string>
+    <string name="no_scope_rules">No page-specific configurations</string>
     
     <string name="action_reset_default">Reset to Default</string>
     <string name="action_clear_config">Clear Configuration</string>
@@ -48,8 +55,8 @@
     <string name="hint_search_activity">Search Activity or enter wildcard...</string>
     <string name="btn_custom_activity">Use Custom/Wildcard</string>
     
-    <string name="dialog_title_page_config">Edit Page Rule</string>
-    <string name="dialog_title_page_config_detail">Page Rule Details</string>
+    <string name="dialog_title_page_config">Edit Page Configuration</string>
+    <string name="dialog_title_page_config_detail">Page Configuration Details</string>
     <string name="field_activity_name">Activity / Pattern</string>
     <string name="switch_edge_to_edge">Edge-to-Edge</string>
     <string name="switch_clear_translucent">Clear Translucent Flags</string>
@@ -80,27 +87,27 @@
     
     <!-- Config Edit & Detail Actions -->
     <string name="title_app_config_edit">Edit Configuration</string>
-    <string name="btn_edit_config">Edit Rules</string>
-    <string name="state_global_e2e_enabled">Global Edge-to-Edge: Enabled</string>
-    <string name="state_global_e2e_disabled">Global Edge-to-Edge: Disabled</string>
+    <string name="btn_edit_config">Edit Config</string>
+    <string name="state_global_e2e_enabled">Edge-to-Edge: Enabled</string>
+    <string name="state_global_e2e_disabled">Edge-to-Edge: Disabled</string>
     <string name="dialog_discard_title">Discard Changes?</string>
     <string name="dialog_discard_message">You have unsaved changes. Are you sure you want to discard them?</string>
     <string name="action_discard">Discard</string>
     <string name="action_keep_editing">Keep Editing</string>
     
     <!-- Settings Screen -->
-    <string name="pref_category_rules">Rules &amp; Synchronization</string>
+    <string name="pref_category_configs">Configurations &amp; Synchronization</string>
     <string name="pref_force_sync_title">Force Sync to LSPosed</string>
-    <string name="pref_force_sync_summary">Re-push all configured application rules to LSPosed framework</string>
-    <string name="pref_export_rules_title">Export Rules Backup</string>
-    <string name="pref_export_rules_summary">Export all application configurations to a JSON file</string>
-    <string name="pref_import_rules_title">Import Rules Backup</string>
-    <string name="pref_import_rules_summary">Restore application configurations from a JSON file</string>
-    <string name="pref_reset_all_rules_title">Clear All Rules</string>
-    <string name="pref_reset_all_rules_summary">Delete all application configurations permanently</string>
+    <string name="pref_force_sync_summary">Re-push all application configurations to LSPosed framework</string>
+    <string name="pref_export_configs_title">Export Configurations Backup</string>
+    <string name="pref_export_configs_summary">Export all application configurations to a JSON file</string>
+    <string name="pref_import_configs_title">Import Configurations Backup</string>
+    <string name="pref_import_configs_summary">Restore application configurations from a JSON file</string>
+    <string name="pref_reset_all_configs_title">Clear All Configurations</string>
+    <string name="pref_reset_all_configs_summary">Delete all application configurations permanently</string>
     
     <string name="dialog_reset_all_title">Clear All Configurations?</string>
-    <string name="dialog_reset_all_message">This will permanently delete all customized rules for all applications. This action cannot be undone.</string>
+    <string name="dialog_reset_all_message">This will permanently delete all customized configurations for all applications. This action cannot be undone.</string>
     <string name="action_clear">Clear</string>
 
     <string name="pref_category_appearance">Appearance</string>
@@ -117,11 +124,11 @@
     <string name="pref_license_summary">Apache License 2.0</string>
 
     <string name="msg_sync_success">Successfully synced %1$d app configurations to LSPosed</string>
-    <string name="msg_export_success">Rules exported successfully</string>
-    <string name="msg_export_failed">Failed to export rules: %1$s</string>
+    <string name="msg_export_success">Configurations exported successfully</string>
+    <string name="msg_export_failed">Failed to export configurations: %1$s</string>
     <string name="msg_import_success">Successfully imported %1$d app configurations</string>
-    <string name="msg_import_failed">Failed to import rules: %1$s</string>
-    <string name="msg_reset_all_success">All rules cleared successfully</string>
+    <string name="msg_import_failed">Failed to import configurations: %1$s</string>
+    <string name="msg_reset_all_success">All configurations cleared successfully</string>
     
     <!-- Overview Screen -->
     <string name="overview_framework_connected">Framework Connected</string>
@@ -130,14 +137,14 @@
     <string name="overview_scope_count">Scope: %1$d apps</string>
     <string name="overview_section_stats">Configuration Statistics</string>
     <string name="overview_stat_configured_apps">Configured Apps</string>
-    <string name="overview_stat_scope_rules">Page Rules</string>
+    <string name="overview_stat_scope_rules">Page Configs</string>
     <string name="overview_stat_global_e2e">Global Edge-to-Edge</string>
     <string name="overview_stat_extra_actions">Extra View Actions</string>
     <string name="overview_section_guide">Quick Guide</string>
-    <string name="overview_btn_view_app_list">View App Rules</string>
+    <string name="overview_btn_view_app_list">View App Configurations</string>
     <string name="overview_guide_step1">1. Select a target application from the App List.</string>
     <string name="overview_guide_step2">2. Enable Global Edge-to-Edge or fine-tune page-specific View insets.</string>
-    <string name="overview_guide_step3">3. Save rules, then force stop and restart the target app to apply changes.</string>
+    <string name="overview_guide_step3">3. Save configurations, then force stop and restart the target app to apply changes.</string>
     
     <!-- Scope List Dialog -->
     <string name="scope_dialog_title">Active Scope</string>

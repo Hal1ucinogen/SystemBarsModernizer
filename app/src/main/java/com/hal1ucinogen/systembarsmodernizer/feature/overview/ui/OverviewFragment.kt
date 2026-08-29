@@ -58,7 +58,7 @@ class OverviewFragment : BaseFragment<FragmentOverviewBinding>(), SBMApp.Service
     private fun observeData() {
         viewModel.stats.observe(viewLifecycleOwner) { stats ->
             binding.tvStatConfiguredApps.text = stats.configuredAppsCount.toString()
-            binding.tvStatScopeRules.text = stats.totalScopeRulesCount.toString()
+            binding.tvStatScopeRules.text = stats.totalScopeConfigsCount.toString()
             binding.tvStatGlobalE2e.text = stats.globalE2eAppsCount.toString()
             binding.tvStatExtraActions.text = stats.totalExtraActionsCount.toString()
         }

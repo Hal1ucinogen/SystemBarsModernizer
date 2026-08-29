@@ -168,7 +168,7 @@ class AppConfigEditActivity : BaseActivity<ActivityAppConfigEditBinding>() {
 
                 if (general.config.extraActions.isNotEmpty()) {
                     val actionsChip = Chip(this).apply {
-                        text = "动作: ${general.config.extraActions.size}"
+                        text = "ExtraActions: ${general.config.extraActions.size}"
                         isEnabled = false
                     }
                     binding.chipGroupGeneralBadges.addView(actionsChip)

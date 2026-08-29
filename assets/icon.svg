@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Gradient (暗夜岩蓝渐变) -->
+    <radialGradient id="bgGrad" cx="54" cy="54" r="72" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F2231"/>
+      <stop offset="65%" stop-color="#0B1824"/>
+      <stop offset="100%" stop-color="#060E16"/>
+    </radialGradient>
+    <!-- 经典圆角矩形遮罩 (Squircle Mask) -->
+    <clipPath id="squircleClip">
+      <rect x="0" y="0" width="108" height="108" rx="24" ry="24" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#squircleClip)">
+    <!-- 背景层 -->
+    <rect width="108" height="108" fill="url(#bgGrad)" />
+
+    <!-- 1. 外部指示箭头：顶部朝上 (Y: 21~26.5) -->
+    <path d="M54,26.5 L54,21.5" stroke="#85E8C8" stroke-width="2.0" stroke-linecap="round" fill="none"/>
+    <path d="M50,24.5 L54,21 L58,24.5" stroke="#85E8C8" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- 2. 外部指示箭头：底部朝下 (Y: 81.5~87) -->
+    <path d="M54,81.5 L54,86.5" stroke="#85E8C8" stroke-width="2.0" stroke-linecap="round" fill="none"/>
+    <path d="M50,83.5 L54,87 L58,83.5" stroke="#85E8C8" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- 3. 中央 3:4 翡翠绿手机画板 (宽 38dp, 高 50dp, 圆角 8dp) -->
+    <rect x="35" y="29" width="38" height="50" rx="8" ry="8" fill="#00B86B" />
+
+    <!-- 4. 官方标准 Google Android 机器人头部 (Bugdroid，等比缩放 0.58 居中) -->
+    <g transform="translate(54, 58.528) scale(0.58) translate(-54, -63.928)">
+      <path fill="#FFFFFF" fill-rule="nonzero" d="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z" />
+    </g>
+
+    <!-- 5. 底部手势横条 (下移且纤细化 1.6dp) -->
+    <path d="M47.5,75.8 h13" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

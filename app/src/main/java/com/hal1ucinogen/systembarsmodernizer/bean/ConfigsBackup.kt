@@ -3,8 +3,10 @@ package com.hal1ucinogen.systembarsmodernizer.bean
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RulesBackup(
+data class ConfigsBackup(
     val version: Int = 1,
     val timestamp: Long = System.currentTimeMillis(),
-    val rules: List<AppConfig>
+    val configs: List<AppConfig>
 )
+
+typealias RulesBackup = ConfigsBackup

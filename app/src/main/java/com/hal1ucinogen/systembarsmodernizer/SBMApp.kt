@@ -18,7 +18,6 @@ import com.hal1ucinogen.systembarsmodernizer.util.PackageUtils
 import com.hal1ucinogen.systembarsmodernizer.util.UiUtils
 import io.github.libxposed.service.XposedService
 import io.github.libxposed.service.XposedServiceHelper
-import rikka.material.app.LocaleDelegate
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArraySet
 import kotlin.concurrent.Volatile
@@ -87,10 +86,13 @@ class SBMApp : Application(), XposedServiceHelper.OnServiceListener, ImageLoader
         super.onCreate()
         XposedServiceHelper.registerListener(this)
         app = this
-//        Utility.init(this)
-        LocaleDelegate.defaultLocale = GlobalValues.locale
         if (OsUtils.atLeastT()) {
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(GlobalValues.locale))
+            val tag = GlobalValues.localeTag
+            if (tag.isNullOrEmpty() || tag == "SYSTEM") {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+            } else {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+            }
         }
         AppCompatDelegate.setDefaultNightMode(UiUtils.getNightMode())
         DynamicColors.applyToActivitiesIfAvailable(this)

@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/icon.png" width="128" height="128" alt="Edgefitter Logo" />
+
 # Edgefitter
 
 > *Formerly **SystemBarsModernizer***

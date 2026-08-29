@@ -73,33 +73,27 @@ object GlobalValues {
     var preferredRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "zh-Hans")
 
 
+    var localeTag: String by SPDelegates(Constants.PREF_LOCALE, "SYSTEM")
+
     var locale: Locale = Locale.getDefault()
         get() {
             if (OsUtils.atLeastT()) {
                 val systemSelectedLocale =
                     SystemServices.localeManager.getApplicationLocales(SBMApp.app.packageName)
-                Timber.d("System selected locale: $systemSelectedLocale")
-                val locale = systemSelectedLocale.get(0) ?: Locale.getDefault()
-                if (locale != field) {
-                    field = locale
-                    getPreferences().edit {
-                        putString(
-                            Constants.PREF_LOCALE,
-                            locale.toLanguageTag()
-                        )
-                    }
+                val appLocale = systemSelectedLocale.get(0)
+                if (appLocale != null) {
+                    return appLocale
                 }
-                return locale
             }
-            val tag = getPreferences().getString(Constants.PREF_LOCALE, null)
-            if (tag.isNullOrEmpty() || "SYSTEM" == tag) {
+            val tag = localeTag
+            if (tag.isEmpty() || "SYSTEM" == tag) {
                 return Locale.getDefault()
             }
             return Locale.forLanguageTag(tag)
         }
         set(value) {
             field = value
-            getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
+            localeTag = value.toLanguageTag()
         }
 
     var uuid: String by SPDelegates(Constants.PREF_UUID, String())

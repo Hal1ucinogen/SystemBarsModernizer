@@ -3,6 +3,7 @@ package com.hal1ucinogen.systembarsmodernizer.feature.applist.ui.adapter
 import android.view.ViewGroup
 import coil.load
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import com.hal1ucinogen.systembarsmodernizer.R
 import com.hal1ucinogen.systembarsmodernizer.database.entity.SBMItem
 import com.hal1ucinogen.systembarsmodernizer.feature.applist.ui.view.AppItemView
 import com.hal1ucinogen.systembarsmodernizer.ui.adapter.HighlightAdapter
@@ -34,33 +35,28 @@ class AppAdapter : HighlightAdapter<SBMItem>() {
             }
             setOrHighlightText(appName, item.label)
             setOrHighlightText(packageName, item.packageName)
-            if (packageInfo == null) {
-                appName.addStrikeThroughSpan()
-                packageName.addStrikeThroughSpan()
-            }
-            
             versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
             
             if (packageInfo == null) {
                 appName.addStrikeThroughSpan()
                 packageName.addStrikeThroughSpan()
                 view.alpha = 0.6f
-                setStatusBadge("已卸载", isPrimary = false)
+                setStatusBadge(context.getString(R.string.badge_uninstalled), isPrimary = false)
             } else {
                 view.alpha = 1.0f
                 val config = item.config
                 if (config != null) {
                     val scopeCount = config.scope.size
                     val badgeText = if (config.general != null && scopeCount == 0) {
-                        "全局边到边"
+                        context.getString(R.string.badge_global_edge_to_edge)
                     } else if (config.general != null) {
-                        "全局 + $scopeCount 页"
+                        context.getString(R.string.badge_global_with_pages, scopeCount)
                     } else {
-                        "规则 ($scopeCount)"
+                        context.getString(R.string.badge_scope_configs, scopeCount)
                     }
                     setStatusBadge(badgeText, isPrimary = true)
                 } else if (item.isSystem) {
-                    setStatusBadge("系统", isPrimary = false)
+                    setStatusBadge(context.getString(R.string.badge_system), isPrimary = false)
                 } else {
                     setStatusBadge(null)
                 }

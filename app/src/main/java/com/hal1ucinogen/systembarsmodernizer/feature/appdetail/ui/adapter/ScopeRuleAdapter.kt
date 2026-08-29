@@ -1,6 +1,5 @@
 package com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui.adapter
 
-import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.view.isGone
@@ -32,7 +31,7 @@ class ScopeRuleAdapter(
         val actionCount = item.config.extraActions.size
         if (actionCount > 0) {
             badgeActionsCount.isGone = false
-            badgeActionsCount.text = "动作: $actionCount"
+            badgeActionsCount.text = "ExtraActions: $actionCount"
         } else {
             badgeActionsCount.isGone = true
         }

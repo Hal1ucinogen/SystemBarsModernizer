@@ -3,6 +3,7 @@ package com.hal1ucinogen.systembarsmodernizer.feature.settings.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -10,14 +11,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.hal1ucinogen.systembarsmodernizer.BuildConfig
 import com.hal1ucinogen.systembarsmodernizer.R
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
-import com.hal1ucinogen.systembarsmodernizer.bean.RulesBackup
+import com.hal1ucinogen.systembarsmodernizer.bean.ConfigsBackup
 import com.hal1ucinogen.systembarsmodernizer.database.SBMDatabase
 import com.hal1ucinogen.systembarsmodernizer.database.entity.SBMItem
 import com.hal1ucinogen.systembarsmodernizer.feature.applist.data.sync.ConfigSyncManager
@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import androidx.preference.PreferenceFragmentCompat
 import rikka.insets.WindowInsetsHelper
 import rikka.preference.SimpleMenuPreference
 import java.text.SimpleDateFormat
@@ -37,13 +38,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private val jsonFormatter = Json {
         prettyPrint = true
         ignoreUnknownKeys = true
+        isLenient = true
+        encodeDefaults = true
     }
 
     private val exportLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
         if (uri != null) {
-            exportRulesToUri(uri)
+            exportConfigsToUri(uri)
         }
     }
 
@@ -51,7 +54,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         ActivityResultContracts.OpenDocument()
     ) { uri ->
         if (uri != null) {
-            importRulesFromUri(uri)
+            importConfigsFromUri(uri)
         }
     }
 
@@ -62,7 +65,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     ): RecyclerView {
         val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState)
         recyclerView.clipToPadding = false
-        WindowInsetsHelper.attach(
+        rikka.insets.WindowInsetsHelper.attach(
             recyclerView,
             false,
             android.view.Gravity.BOTTOM,
@@ -76,26 +79,26 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
         // 1. Force Sync
-        findPreference<Preference>("pref_force_sync_rules")?.setOnPreferenceClickListener {
-            forceSyncRules()
+        findPreference<Preference>("pref_force_sync_configs")?.setOnPreferenceClickListener {
+            forceSyncConfigs()
             true
         }
 
-        // 2. Export Rules
-        findPreference<Preference>("pref_export_rules")?.setOnPreferenceClickListener {
+        // 2. Export Configs
+        findPreference<Preference>("pref_export_configs")?.setOnPreferenceClickListener {
             val dateStr = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            exportLauncher.launch("SBM_Rules_$dateStr.json")
+            exportLauncher.launch("SBM_Configs_$dateStr.json")
             true
         }
 
-        // 3. Import Rules
-        findPreference<Preference>("pref_import_rules")?.setOnPreferenceClickListener {
+        // 3. Import Configs
+        findPreference<Preference>("pref_import_configs")?.setOnPreferenceClickListener {
             importLauncher.launch(arrayOf("application/json", "text/*", "*/*"))
             true
         }
 
-        // 4. Reset All Rules
-        findPreference<Preference>("pref_reset_all_rules")?.setOnPreferenceClickListener {
+        // 4. Reset All Configs
+        findPreference<Preference>("pref_reset_all_configs")?.setOnPreferenceClickListener {
             showResetAllDialog()
             true
         }
@@ -142,7 +145,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun forceSyncRules() {
+    private fun forceSyncConfigs() {
         val appContext = context?.applicationContext ?: return
         lifecycleScope.launch(Dispatchers.IO) {
             val dao = SBMDatabase.getDatabase(appContext).sbmItemDao()
@@ -168,7 +171,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun exportRulesToUri(uri: Uri) {
+    private fun exportConfigsToUri(uri: Uri) {
         val appContext = context?.applicationContext ?: return
         lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
@@ -176,10 +179,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val configuredItems = dao.getConfiguredItemsSync()
                 val configs = configuredItems.mapNotNull { it.config }
 
-                val backup = RulesBackup(
+                val backup = ConfigsBackup(
                     version = 1,
                     timestamp = System.currentTimeMillis(),
-                    rules = configs
+                    configs = configs
                 )
                 val jsonString = jsonFormatter.encodeToString(backup)
 
@@ -206,7 +209,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun importRulesFromUri(uri: Uri) {
+    private fun importConfigsFromUri(uri: Uri) {
         val appContext = context?.applicationContext ?: return
         lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
@@ -215,7 +218,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 } ?: error("Unable to open input stream")
 
                 val configs = runCatching {
-                    jsonFormatter.decodeFromString<RulesBackup>(content).rules
+                    jsonFormatter.decodeFromString<ConfigsBackup>(content).configs
                 }.getOrElse {
                     jsonFormatter.decodeFromString<List<AppConfig>>(content)
                 }
@@ -281,12 +284,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             .setMessage(R.string.dialog_reset_all_message)
             .setNegativeButton(R.string.action_cancel, null)
             .setPositiveButton(R.string.action_clear) { _, _ ->
-                resetAllRules()
+                resetAllConfigs()
             }
             .show()
     }
 
-    private fun resetAllRules() {
+    private fun resetAllConfigs() {
         val appContext = context?.applicationContext ?: return
         lifecycleScope.launch(Dispatchers.IO) {
             val dao = SBMDatabase.getDatabase(appContext).sbmItemDao()
