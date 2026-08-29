@@ -26,6 +26,20 @@
 
 **Edgefitter**（曾用名 *SystemBarsModernizer*）是一个基于现代化 **LibXposed (API 102)** 标准构建的高性能 Xposed 模块。它通过在系统框架层与视图层进行精准拦截与参数改写，为各类应用强制启用 **Edge-to-Edge 边到边渲染**，并提供细粒度的布局边距矫正引擎，彻底消除黑条、切边与多余垫高。
 
+### 💡 名字的由来与设计哲学（Why "Edgefitter"?）
+
+> *“Stay on the edge. Fit to perfection.” —— 游走边界，极致贴合。*
+
+* **🔄 初心与演进（From Modernizer to Fitter）**：
+  项目原名 **SystemBarsModernizer**，寓意直白清晰——*“Modernize your system bars”*（让系统栏迈向现代化），旨在终结老旧应用在状态栏与导航栏上的割裂与陈旧渲染。随着架构演进，模块不仅实现了宏观的现代化改造，更沉淀出强大的细粒度布局矫正引擎与鲜明的极客态度，因而正式更名为 **Edgefitter**。
+* **⚡ 赛博朋克文化隐喻**：
+  名字灵感与构词致敬《赛博朋克：边缘行者》（*Cyberpunk: Edgerunners*）。遵循赛博朋克世界观中将复合词融为专有名词的构词习惯（如 *Netrunner*、*Edgerunner*），**Edgefitter** 采用小写 `f` 作为一个浑然一体的极客身份代号。正如游走在夜之城规则边缘的行者，作为底层模块，它游走在 Android 视图系统与 Framework 的边界，打破旧框架与陈旧布局的桎梏。
+* **🎯 功能与动作的精准双关**：
+  - **Edge**：承袭现代化系统栏体验的使命，直指 **Edge-to-Edge（真·边到边）** 与全面屏边界；
+  - **Fitter**：直击模块核心——不仅是一键开关，更像一位精密的**边缘装配工 / 拟合者**，通过 `ExtraAction` 引擎对 Insets、Padding 与 Margin 开展细粒度微调与矫正，让每个界面与系统栏严丝合缝。
+* **📱 桌面排版与视觉体验**：
+  相较于原名 *SystemBarsModernizer*（20 字符），*Edgefitter*（10 字符）更加干练利落，在 Android 桌面启动器及 LSPosed 模块列表中彻底告别文字省略号截断。
+
 ---
 
 ## ✨ 核心特性
@@ -48,9 +62,6 @@
   - `WeakHashMap<Activity, PageConfig?>` 弱引用缓存，页面配置 O(1) 内存直取；
   - Fast-Path 短路机制：非目标页面与普通 View 在第 1 行指令直接放行，**单次排版拦截仅需 ~26ns**；
   - 120Hz/144Hz 高刷设备丝滑满帧，零掉帧与零内存泄露。
-- 🛡️ **编译期调试隔离**：
-  View 树结构转储（`dumpViewHierarchy`）受 `BuildConfig.DEBUG` 守卫，正式 Release 包零反射与日志消耗。
-
 ---
 
 ## 🏗️ 工作原理与架构
@@ -67,9 +78,9 @@
                                │
             ┌──────────────────┼──────────────────┐
             │                  │                  │
-    ┌───────▼────────┐ ┌───────▼────────┐ ┌───────▼────────┐
-    │ Activity.onCreate│ │ View.setPadding│ │setLayoutParams│
-    └───────┬────────┘ └───────┬────────┘ └───────┬────────┘
+  ┌─────────▼────────┐ ┌───────▼────────┐ ┌───────▼────────┐
+  │ Activity.onCreate│ │ View.setPadding│ │ setLayoutParams│
+  └─────────┬────────┘ └───────┬────────┘ └───────┬────────┘
             │                  │                  │
    设置 Window 边到边     Fast-Path 短路    Fast-Path 短路
    注入系统透明栏颜色     执行 Padding 改写  执行 Margin 改写
@@ -113,7 +124,7 @@ data class ExtraAction(
 )
 ```
 
-#### 常见场景配置范式：
+#### 常见额外动作配置范式：
 
 - **场景 1：清空特定容器 View 的底部 Padding（解决 Web/Hybrid 容器底部留白）**
   ```kotlin
@@ -132,22 +143,33 @@ data class ExtraAction(
 
 ## 🗺️ 路线图与规划（Roadmap & TODO）
 
-目前项目的核心 Hook 引擎与规则执行体系已完全就绪，管理端 App 的可视化与动态管理能力正在积极重构中：
+目前 Edgefitter 的核心 Hook 引擎与管理端 App（包含可视化应用列表、多层级规则编辑器、实时框架状态看板、本地配置导入导出及双语本地化）均已完整构建就绪：
 
-- [ ] **应用列表可视化（App List）**：
-  - 扫描并展示设备上已安装的全部第三方与系统应用；
-  - 异步加载应用图标、名称、包名与边到边启用状态；
-  - 采用 Room 数据库 + MVVM + DiffUtil 扁平化自定义 View 极速渲染。
-- [ ] **规则配置动态编辑器（Rule Editor & CRUD）**：
-  - 支持按应用查看所有页面规则（`PageConfig`）与高级动作（`ExtraAction`）；
-  - 提供可视化的规则添加、修改、删除（增删查改）与实时搜索能力；
-  - 支持快捷配置：一键设置 `Edge-to-Edge`、一键添加 `decor` 索引 / 占位 View 隐藏 / Padding 与 Margin 改写。
-- [ ] **配置实时同步推送（Sync to LSPosed / Hook Engine）**：
-  - 动态保存并直接更新 `RemotePreferences`；
-  - 无需重启 LSPosed 或手机，应用切到前台即可实时读取最新配置并热生效。
-- [ ] **规则云端订阅与导入导出**：
-  - 支持规则配置 JSON 导出与本地备份导入；
-  - 支持在线订阅社区贡献的 App 边到边适配规则池。
+- [x] **应用列表可视化（App List）**：
+  - [x] 扫描并展示设备上已安装的全部第三方与系统应用，支持多维度过滤（全部/已配置/用户/系统）；
+  - [x] 异步加载应用图标、名称、包名与规则配置状态；
+  - [x] 采用 Room 数据库 + MVVM + DiffUtil 极速流畅渲染与实时搜索。
+- [x] **可视化规则动态编辑器（Rule Editor & CRUD）**：
+  - [x] 支持按应用查看与精细化管理全局规则（GeneralConfig）、排除页面（exclusive）及专属页面规则（PageConfig）；
+  - [x] ExtraAction 动作可视化配置：Padding/Margin 改写、系统 Insets 注入、占位 View 隐藏（`isGone`）与 DecorView 索引定位；
+  - [x] Activity 智能选择器（支持已声明 Activity 列表读取与 `*` 通配符/自定义类名输入）。
+- [x] **配置实时热同步（Sync to LSPosed / Hook Engine）**：
+  - [x] 规则保存后动态写入并推送至 `RemotePreferences`；
+  - [x] 配合 LibXposed API 102 热重载与进程就绪通知，目标应用前后台切换即刻热生效；
+  - [x] 提供设置页一键“强制同步规则”能力。
+- [x] **概览与框架状态监控（Overview Dashboard）**：
+  - [x] 实时探测 LibXposed 激活状态与模块挂载连通性；
+  - [x] 规则应用数、全局 E2E 启用数与 ExtraAction 动作总数可视化统计；
+  - [x] 快捷查看当前生效的作用域应用列表（Scope Dialog）。
+- [x] **本地配置备份与多语言本地化**：
+  - [x] 规则配置全量 JSON 导出与安全导入备份（ConfigsBackup）；
+  - [x] 完整的双语本地化支持（简体中文 `zh-CN` / 英文 `en`）；
+  - [x] 现代自适应应用图标与 Android 13+ 动态主题取色图标（Themed Icon）。
+- [ ] **规则云端订阅与社区生态**：
+  - [ ] 规则云端订阅源支持，一键拉取并合并社区热门应用适配规则池；
+  - [ ] 规则在线分享与冲突智能合并（Merge）。
+- [ ] **进阶调试与辅助工具（In-App Inspector）**：
+  - [ ] 目标应用内悬浮 View 树抓取与定位辅助工具，一键生成对应 ExtraAction。
 
 ---
 
