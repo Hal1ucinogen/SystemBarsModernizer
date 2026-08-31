@@ -80,6 +80,7 @@
     <string name="switch_is_group">目标为 ViewGroup</string>
     <string name="switch_self">作用于自身</string>
     <string name="field_child_index">子 View 索引（-1 为无/全选）</string>
+    <string name="field_delay">动作延迟 (ms)</string>
     
     <string name="msg_config_saved">配置已保存并同步推送至 LSPosed</string>
     <string name="msg_config_reset">配置已重置为默认</string>

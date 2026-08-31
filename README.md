@@ -120,7 +120,8 @@ data class ExtraAction(
     val customInset: Int = -1,         // 自定义边距像素值（设为 0 即清空边距）
     val self: Boolean = true,          // 是否作用于自身（false 则作用于 childIndex 对应子 View）
     val childIndex: Int = -1,          // 目标子 View 索引（如 0）
-    val isGone: Boolean = false        // 是否强制设为 View.GONE 消除占位 View
+    val isGone: Boolean = false,       // 是否强制设为 View.GONE 消除占位 View
+    val delay: Long = 100L             // 动作执行延迟时间（毫秒，默认 100ms）
 )
 ```
 
@@ -138,6 +139,47 @@ data class ExtraAction(
   ```kotlin
   ExtraAction(viewId = "nav_placeholder_view", isGone = true)
   ```
+- **场景 4：裁剪隐藏底部导航栏的无用 Tab（实现底栏功能净化与自适应均分）**
+  ```kotlin
+  // 查找底栏 ViewGroup（如 "tabs"），将其第 1 个子 Tab 设为 GONE，剩余 Tab 自动均分平铺
+  ExtraAction(viewId = "tabs", isGroup = true, self = false, childIndex = 1, isGone = true)
+  ```
+- **场景 5：针对异步渲染/慢加载视图的延迟动作**
+  ```kotlin
+  // 针对网络返回后才动态插入的容器，设置 500ms~1000ms 延迟后精准执行
+  ExtraAction(viewId = "bottom_floating_bar", isGone = true, delay = 500L)
+  ```
+
+---
+
+## 🌐 系统版本兼容性与演进矩阵 (Compatibility Matrix)
+
+为了消除不同 Android 系统版本（从 Android 10 到 Android 15+）以及不同应用目标 API（Target SDK）之间的渲染割裂，Edgefitter 采用**窗口级系统栏接管**与**视图级动态拦截**双层兼容架构。
+
+### 1. 窗口与系统栏命令（Window Level）兼容性
+
+| 命令 / 操作 | Android 10 ~ 14<br>(主流环境) | Android 15+<br>(App Target &lt; 35) | Android 15+<br>(App Target &ge; 35) | 机制说明 |
+| :--- | :---: | :---: | :---: | :--- |
+| **`WindowCompat.setDecorFitsSystemWindows(window, false)`** | 🌟 **强力生效** | 🌟 **强力生效** | 🌟 **系统默认开启** | 拓宽整个 Window 内容区域延伸至屏幕顶底极限（边到边）。 |
+| **`statusBarColor = TRANSPARENT`<br>`navigationBarColor = TRANSPARENT`** | 🌟 **强力生效** | 🌟 **强力生效** | 🌟 **系统强制透明** | 将系统栏背景色设为全透明，彻底消除传统黑条。 |
+| **`isNavigationBarContrastEnforced = false`** | 🔥 **核心关键点** | 🔥 **核心关键点** | 🌟 **系统默认关闭** | 撕掉 Android 10+ 浅色模式下底层强加的 80% 灰黑色系统遮罩（Scrim）。 |
+| **`layoutInDisplayCutoutMode = ALWAYS`** | 🌟 **强力生效** | 🌟 **强力生效** | 🌟 **强力生效** | 确保横竖屏切换时内容区域均能贯穿挖孔屏/刘海区域。 |
+
+> [!NOTE]
+> 从 Android 15 (API 35) 开始，Google 将 `setStatusBarColor` 与 `setNavigationBarContrastEnforced` 等标记为 Deprecated，并在系统底层强制推行全透明边到边。由于 Edgefitter 注入的正是 `Color.TRANSPARENT` 与 `isContrastEnforced = false`，因此在 Android 15 + Target 35 下模块行为与系统原生规范 **100% 吻合**，且在 Android 10~14 上依然是消除系统灰色遮罩的必要手段。
+
+### 2. 视图与拦截器命令（View Level - 核心护城河）
+
+| 拦截器 / 动作 | 涉及机制与 Hook | 在所有 Android 版本 & 所有 Target SDK 的有效性 |
+| :--- | :--- | :---: |
+| **Padding 动态矫正** | `View.setPadding` / `setPaddingRelative` | 💯 **100% 永久有效** |
+| **Margin 参数改写** | `View.setLayoutParams` (`MarginLayoutParams`) | 💯 **100% 永久有效** |
+| **占位 View 抹除** | `View.setVisibility` (`ExtraAction.isGone`) | 💯 **100% 永久有效** |
+| **DecorView 索引定位** | `decorView.getChildAt(index)` | 💯 **100% 永久有效** |
+
+> [!TIP]
+> **为什么视图级命令在 Android 15 上依然不可替代？**
+> Android 15 的系统边到边升级仅解决了**系统窗口的外层贴边**，无法解决第三方 App 内部写死的内部逻辑（如特定业务容器加的 `bottomMargin`、72px 导航占位 View、Web/Hybrid 容器写死的内部 Padding 垫高）。Edgefitter 的视图级拦截引擎在任何 Android 版本下都是抹平第三方应用内部排版缺陷的终极手段。
 
 ---
 

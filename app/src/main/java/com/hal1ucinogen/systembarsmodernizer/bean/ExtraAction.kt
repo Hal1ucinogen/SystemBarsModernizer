@@ -12,5 +12,6 @@ data class ExtraAction(
     val customInset: Int = -1,
     val self: Boolean = true,
     val childIndex: Int = -1,
-    val isGone: Boolean = false
+    val isGone: Boolean = false,
+    val delay: Long = 100L
 )

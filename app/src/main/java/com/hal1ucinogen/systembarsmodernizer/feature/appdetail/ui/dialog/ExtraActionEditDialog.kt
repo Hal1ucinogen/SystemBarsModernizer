@@ -55,6 +55,9 @@ class ExtraActionEditDialog(
             if (action.childIndex >= 0) {
                 binding.etChildIndex.setText(action.childIndex.toString())
             }
+            binding.etDelay.setText(action.delay.toString())
+        } ?: run {
+            binding.etDelay.setText("100")
         }
 
         fun updateVisibility() {
@@ -85,6 +88,7 @@ class ExtraActionEditDialog(
             val isGroup = binding.switchIsGroup.isChecked
             val self = binding.switchSelf.isChecked
             val childIndex = binding.etChildIndex.text?.toString()?.toIntOrNull() ?: -1
+            val delay = binding.etDelay.text?.toString()?.toLongOrNull() ?: 100L
 
             val action = ExtraAction(
                 viewId = viewId,
@@ -95,7 +99,8 @@ class ExtraActionEditDialog(
                 customInset = customInset,
                 self = self,
                 childIndex = childIndex,
-                isGone = isGone
+                isGone = isGone,
+                delay = delay
             )
 
             onActionSaved(action)

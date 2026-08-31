@@ -12,7 +12,12 @@ object DefaultConfigs {
         AppConfig(
             "com.spotify.music",
             1,
-            mapOf("com.spotify.nowplaying.musicinstallation.NowPlayingActivity" to PageConfig(edgeToEdge = false, clearTranslucent = true))
+            mapOf(
+                "com.spotify.nowplaying.musicinstallation.NowPlayingActivity" to PageConfig(
+                    edgeToEdge = false,
+                    clearTranslucent = true
+                )
+            )
         ),
         // 闲鱼
         AppConfig(
@@ -25,7 +30,32 @@ object DefaultConfigs {
         AppConfig(
             "com.jingdong.app.mall",
             1,
-            mapOf(),
+            mapOf(
+                /*"com.jingdong.app.mall.MainFrameActivity" to PageConfig(
+                    edgeToEdge = false,
+                    navigationColor = Color.TRANSPARENT,
+                    windowBackgroundColor = Color.WHITE,
+                    extraActions = listOf(
+//                        ExtraAction(
+//                            "navigation_fragment",
+//                            isGroup = true,
+//                            self = true,
+//                            isPadding = false,
+//                            isTop = false,
+//                            useSystemInsets = true
+//                        ),
+                        ExtraAction
+                            (
+                            viewId = "bottomMenu_Code",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 1,
+                            isGone = true,
+                                    delay = 1000L
+                        )
+                    )
+                )*/
+            ),
             general = GeneralConfig(
                 PageConfig(edgeToEdge = true),
                 exclusive = listOf(
@@ -48,8 +78,19 @@ object DefaultConfigs {
             1,
             mapOf(
                 "com.taobao.tao.welcome.Welcome" to PageConfig(
+                    edgeToEdge = false,
                     navigationColor = Color.TRANSPARENT,
-                    windowBackgroundColor = Color.WHITE
+                    windowBackgroundColor = Color.WHITE,
+                    extraActions = listOf(
+                        ExtraAction
+                            (
+                            viewId = "tabs",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 1,
+                            isGone = true
+                        )
+                    )
                 ),
                 "com.taobao.themis.container.app.TMSActivity" to PageConfig(
                     edgeToEdge = true,
@@ -106,7 +147,12 @@ object DefaultConfigs {
             )
         ),
         // 电笠
-        AppConfig("media.dl", 1, emptyMap(), general = GeneralConfig(PageConfig(edgeToEdge = true))),
+        AppConfig(
+            "media.dl",
+            1,
+            emptyMap(),
+            general = GeneralConfig(PageConfig(edgeToEdge = true))
+        ),
         // 小黑盒
         AppConfig(
             "com.max.xiaoheihe", 1,
@@ -127,7 +173,16 @@ object DefaultConfigs {
                 "com.douban.frodo.baseproject.image.ImageActivity" to PageConfig(edgeToEdge = true),
                 "com.douban.frodo.baseproject.image.SociableImageActivity" to PageConfig(
                     edgeToEdge = true,
-                    extraActions = listOf(ExtraAction("social_action_bar", true, false, false, true, self = true))
+                    extraActions = listOf(
+                        ExtraAction(
+                            "social_action_bar",
+                            true,
+                            false,
+                            false,
+                            true,
+                            self = true
+                        )
+                    )
                 ),
                 "com.douban.frodo.profile.activity.NewUserProfileActivity" to PageConfig(edgeToEdge = true)
             )
@@ -140,11 +195,24 @@ object DefaultConfigs {
                 "me.ele.pha.shell.ui.ElePhaActivity" to PageConfig(edgeToEdge = true),
                 "me.ele.muise.page.WeexPageActivity" to PageConfig(edgeToEdge = true),
                 "me.ele.orderdetail.ui.lmagex.WMOrderDetailActivity" to PageConfig(edgeToEdge = true),
-                "me.ele.newretail.emagex.activity.EMagexOrderDetailActivity" to PageConfig(edgeToEdge = true),
+                "me.ele.newretail.emagex.activity.EMagexOrderDetailActivity" to PageConfig(
+                    edgeToEdge = true
+                ),
                 "com.alibaba.triver.container.TriverMainActivity" to PageConfig(edgeToEdge = true),
                 "me.ele.component.webcontainer.view.AppUCWebActivity" to PageConfig(
                     edgeToEdge = true,
-                    extraActions = listOf(ExtraAction("comp_uc_container", true, false, true, false, 0, false, 0))
+                    extraActions = listOf(
+                        ExtraAction(
+                            "comp_uc_container",
+                            true,
+                            false,
+                            true,
+                            false,
+                            0,
+                            false,
+                            0
+                        )
+                    )
                 )
             )
         ),

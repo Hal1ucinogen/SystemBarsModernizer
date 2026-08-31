@@ -348,90 +348,6 @@ class ModuleMain : XposedModule() {
                 window.attributes.layoutInDisplayCutoutMode =
                     WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
             }
-            // TODO There is a inset change issue. Try to useViewCompat.setOnApplyWindowInsetsListener instead
-            pageConfig.extraActions.forEach { extraAction ->
-                log(Log.INFO, TAG, "In ExtraAction | $extraAction")
-                Task.onMain(100) {
-                    val target = when (extraAction.viewId) {
-                        "decor" -> {
-                            val decor = window.decorView as? ViewGroup
-                            if (extraAction.self) decor else decor?.getChildAt(extraAction.childIndex)
-                        }
-                        "content", "android:id/content" -> activity.findViewById<View>(android.R.id.content)
-                        else -> {
-                            if (extraAction.isGroup) {
-                                val group = run {
-                                    val id = window.decorView.resources.getIdentifier(
-                                        extraAction.viewId,
-                                        "id",
-                                        activity.packageName
-                                    )
-                                    val v = if (id != 0) activity.findViewById<ViewGroup>(id) else null
-                                    v ?: (window.decorView.findViewByEntryName(extraAction.viewId) as? ViewGroup)
-                                }
-                                if (group != null) {
-                                    if (extraAction.self) {
-                                        group
-                                    } else {
-                                        group.children.elementAtOrNull(extraAction.childIndex)
-                                    }
-                                } else null
-                            } else {
-                                val id = window.decorView.resources.getIdentifier(
-                                    extraAction.viewId,
-                                    "id",
-                                    activity.packageName
-                                )
-                                val v = if (id != 0) activity.findViewById<View>(id) else null
-                                v ?: window.decorView.findViewByEntryName(extraAction.viewId)
-                            }
-                        }
-                    } ?: return@onMain
-
-                    val inset = if (extraAction.useSystemInsets) {
-                        if (extraAction.isTop) {
-                            activity.getStatusHeight()
-                        } else {
-                            activity.getNavigationHeight()
-                        }
-                    } else {
-                        extraAction.customInset
-                    }
-                    log(Log.INFO, TAG, "Find Target - $target")
-                    log(
-                        Log.INFO,
-                        TAG,
-                        "Target Padding - ${target.paddingTop}|${target.paddingBottom}|${target.paddingStart}|${target.paddingEnd}"
-                    )
-                    log(
-                        Log.INFO,
-                        TAG,
-                        "Target Margin - ${target.marginTop}|${target.marginBottom}|${target.marginStart}|${target.marginEnd}"
-                    )
-                    if (extraAction.isGone) {
-                        target.visibility = View.GONE
-                        target.updateLayoutParams<ViewGroup.LayoutParams> {
-                            height = 0
-                        }
-                    } else if (extraAction.isPadding) {
-                        if (extraAction.isTop) {
-                            target.updatePadding(top = inset)
-                        } else {
-                            target.updatePadding(bottom = inset)
-                        }
-                    } else {
-                        if (extraAction.isTop) {
-                            target.updateLayoutParams<ViewGroup.LayoutParams> {
-                                (this as? ViewGroup.MarginLayoutParams)?.topMargin = inset
-                            }
-                        } else {
-                            target.updateLayoutParams<ViewGroup.LayoutParams> {
-                                (this as? ViewGroup.MarginLayoutParams)?.bottomMargin = inset
-                            }
-                        }
-                    }
-                }
-            }
         } else {
             Task.onMain(100) {
                 if (pageConfig.uiModeWBC != null) {
@@ -456,6 +372,93 @@ class ModuleMain : XposedModule() {
                 window.decorView.post {
                     window.navigationBarColor = pageConfig.navigationColor
                     window.isNavigationBarContrastEnforced = false
+                }
+            }
+        }
+
+        // View 级 ExtraAction 执行
+        // TODO There is a inset change issue. Try to useViewCompat.setOnApplyWindowInsetsListener instead
+        pageConfig.extraActions.forEach { extraAction ->
+            log(Log.INFO, TAG, "In ExtraAction | $extraAction")
+            Task.onMain(extraAction.delay) {
+                val target = when (extraAction.viewId) {
+                    "decor" -> {
+                        val decor = window.decorView as? ViewGroup
+                        if (extraAction.self) decor else decor?.getChildAt(extraAction.childIndex)
+                    }
+                    "content", "android:id/content" -> activity.findViewById<View>(android.R.id.content)
+                    else -> {
+                        if (extraAction.isGroup) {
+                            val group = run {
+                                val id = window.decorView.resources.getIdentifier(
+                                    extraAction.viewId,
+                                    "id",
+                                    activity.packageName
+                                )
+                                val v = if (id != 0) activity.findViewById<ViewGroup>(id) else null
+                                v ?: (window.decorView.findViewByEntryName(extraAction.viewId) as? ViewGroup)
+                            }
+                            if (group != null) {
+                                log(Log.INFO, TAG, "Group | child count:${group.childCount}")
+                                if (extraAction.self) {
+                                    group
+                                } else {
+                                    group.children.elementAtOrNull(extraAction.childIndex)
+                                }
+                            } else null
+                        } else {
+                            val id = window.decorView.resources.getIdentifier(
+                                extraAction.viewId,
+                                "id",
+                                activity.packageName
+                            )
+                            val v = if (id != 0) activity.findViewById<View>(id) else null
+                            v ?: window.decorView.findViewByEntryName(extraAction.viewId)
+                        }
+                    }
+                } ?: return@onMain
+
+                val inset = if (extraAction.useSystemInsets) {
+                    if (extraAction.isTop) {
+                        activity.getStatusHeight()
+                    } else {
+                        activity.getNavigationHeight()
+                    }
+                } else {
+                    extraAction.customInset
+                }
+                log(Log.INFO, TAG, "Find Target - $target")
+                log(
+                    Log.INFO,
+                    TAG,
+                    "Target Padding - ${target.paddingTop}|${target.paddingBottom}|${target.paddingStart}|${target.paddingEnd}"
+                )
+                log(
+                    Log.INFO,
+                    TAG,
+                    "Target Margin - ${target.marginTop}|${target.marginBottom}|${target.marginStart}|${target.marginEnd}"
+                )
+                if (extraAction.isGone) {
+                    target.visibility = View.GONE
+                    target.updateLayoutParams<ViewGroup.LayoutParams> {
+                        height = 0
+                    }
+                } else if (extraAction.isPadding) {
+                    if (extraAction.isTop) {
+                        target.updatePadding(top = inset)
+                    } else {
+                        target.updatePadding(bottom = inset)
+                    }
+                } else {
+                    if (extraAction.isTop) {
+                        target.updateLayoutParams<ViewGroup.LayoutParams> {
+                            (this as? ViewGroup.MarginLayoutParams)?.topMargin = inset
+                        }
+                    } else {
+                        target.updateLayoutParams<ViewGroup.LayoutParams> {
+                            (this as? ViewGroup.MarginLayoutParams)?.bottomMargin = inset
+                        }
+                    }
                 }
             }
         }

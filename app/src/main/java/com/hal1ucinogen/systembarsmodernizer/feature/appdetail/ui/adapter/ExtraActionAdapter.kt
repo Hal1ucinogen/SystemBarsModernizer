@@ -42,6 +42,9 @@ class ExtraActionAdapter(
             if (item.isGroup) {
                 append(" • Group")
             }
+            if (item.delay != 100L) {
+                append(" • ${item.delay}ms")
+            }
         }
         tvSummary.text = summary
 
