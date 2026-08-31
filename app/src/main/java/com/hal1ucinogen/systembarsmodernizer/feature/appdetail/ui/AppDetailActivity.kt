@@ -170,8 +170,13 @@ class AppDetailActivity : BaseActivity<ActivityAppDetailBinding>() {
                         binding.chipGroupExclusive.addView(emptyChip)
                     } else {
                         exclusiveList.forEach { activityName ->
+                            val isInvalid = !viewModel.isActivityValid(activityName)
+                            val simpleName = activityName.substringAfterLast(".")
                             val chip = Chip(this).apply {
-                                text = activityName.substringAfterLast(".")
+                                text = if (isInvalid) "$simpleName (${getString(R.string.badge_activity_missing)})" else simpleName
+                                if (isInvalid) {
+                                    alpha = 0.6f
+                                }
                                 isCloseIconVisible = false
                             }
                             binding.chipGroupExclusive.addView(chip)
@@ -185,11 +190,42 @@ class AppDetailActivity : BaseActivity<ActivityAppDetailBinding>() {
                 if (hasScope) {
                     binding.cardScopeConfig.visibility = View.VISIBLE
                     val scopeRules = config!!.scope.map { (activityName, pageConfig) ->
-                        ScopeRuleItem(activityName, pageConfig)
+                        val isInvalid = !viewModel.isActivityValid(activityName)
+                        ScopeRuleItem(activityName, pageConfig, isInvalid)
                     }
                     scopeRuleAdapter.setList(scopeRules.toMutableList())
                 } else {
                     binding.cardScopeConfig.visibility = View.GONE
+                }
+            }
+        }
+
+        viewModel.declaredActivities.observe(this) {
+            viewModel.appItem.value?.let { item ->
+                val config = item.config ?: return@let
+                val hasScope = config.scope.isNotEmpty()
+                if (hasScope) {
+                    val scopeRules = config.scope.map { (activityName, pageConfig) ->
+                        val isInvalid = !viewModel.isActivityValid(activityName)
+                        ScopeRuleItem(activityName, pageConfig, isInvalid)
+                    }
+                    scopeRuleAdapter.setList(scopeRules.toMutableList())
+                }
+                val general = config.general
+                if (general != null && general.exclusive.isNotEmpty()) {
+                    binding.chipGroupExclusive.removeAllViews()
+                    general.exclusive.forEach { activityName ->
+                        val isInvalid = !viewModel.isActivityValid(activityName)
+                        val simpleName = activityName.substringAfterLast(".")
+                        val chip = Chip(this).apply {
+                            text = if (isInvalid) "$simpleName (${getString(R.string.badge_activity_missing)})" else simpleName
+                            if (isInvalid) {
+                                alpha = 0.6f
+                            }
+                            isCloseIconVisible = false
+                        }
+                        binding.chipGroupExclusive.addView(chip)
+                    }
                 }
             }
         }

@@ -13,14 +13,17 @@ import com.hal1ucinogen.systembarsmodernizer.databinding.DialogPageConfigEditBin
 import com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui.adapter.ExtraActionAdapter
 
 class PageConfigEditDialog(
-    private val activityName: String,
+    private val initialActivityName: String,
     private val initialConfig: PageConfig? = null,
+    private val packageName: String? = null,
+    private val declaredActivities: List<String>? = null,
     private val onConfigSaved: (String, PageConfig) -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var _binding: DialogPageConfigEditBinding? = null
     private val binding get() = _binding!!
 
+    private var currentActivityName: String = initialActivityName
     private lateinit var extraActionAdapter: ExtraActionAdapter
     private val extraActionsList = mutableListOf<ExtraAction>()
 
@@ -36,7 +39,19 @@ class PageConfigEditDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvTargetActivity.text = activityName
+        binding.tvTargetActivity.text = currentActivityName
+
+        if (packageName != null && declaredActivities != null) {
+            binding.btnChangeActivity.visibility = View.VISIBLE
+            binding.btnChangeActivity.setOnClickListener {
+                ActivityPickerDialog(packageName, declaredActivities) { selectedActivity ->
+                    currentActivityName = selectedActivity
+                    binding.tvTargetActivity.text = currentActivityName
+                }.show(childFragmentManager, "ActivityPickerDialog_Change")
+            }
+        } else {
+            binding.btnChangeActivity.visibility = View.GONE
+        }
 
         initialConfig?.let { config ->
             binding.switchE2e.isChecked = config.edgeToEdge
@@ -89,7 +104,7 @@ class PageConfigEditDialog(
                 extraActions = extraActionsList.toList()
             )
 
-            onConfigSaved(activityName, updatedConfig)
+            onConfigSaved(currentActivityName, updatedConfig)
             dismiss()
         }
     }

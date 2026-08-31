@@ -131,7 +131,7 @@ data class ExtraAction(
   ```kotlin
   ExtraAction(viewId = "web_root_container", isTop = false, isPadding = true, customInset = 0)
   ```
-- **场景 2：清空 DecorView 第 0 个子容器的底部 Margin（解决多层容器嵌套下的黑底）**
+- **场景 2：清空 DecorView 第 1 个子容器的底部 Margin（解决多层容器嵌套下的黑底）**
   ```kotlin
   ExtraAction(viewId = "decor", isGroup = true, self = false, childIndex = 0, isTop = false, isPadding = false, customInset = 0)
   ```
@@ -141,12 +141,12 @@ data class ExtraAction(
   ```
 - **场景 4：裁剪隐藏底部导航栏的无用 Tab（实现底栏功能净化与自适应均分）**
   ```kotlin
-  // 查找底栏 ViewGroup（如 "tabs"），将其第 1 个子 Tab 设为 GONE，剩余 Tab 自动均分平铺
+  // 查找底栏 ViewGroup（如 "tabs"），将其第 2 个子 Tab 设为 GONE，剩余 Tab 自动均分平铺
   ExtraAction(viewId = "tabs", isGroup = true, self = false, childIndex = 1, isGone = true)
   ```
 - **场景 5：针对异步渲染/慢加载视图的延迟动作**
   ```kotlin
-  // 针对网络返回后才动态插入的容器，设置 500ms~1000ms 延迟后精准执行
+  // 针对网络返回后才动态插入的容器，设置 500ms 延迟后精准执行
   ExtraAction(viewId = "bottom_floating_bar", isGone = true, delay = 500L)
   ```
 

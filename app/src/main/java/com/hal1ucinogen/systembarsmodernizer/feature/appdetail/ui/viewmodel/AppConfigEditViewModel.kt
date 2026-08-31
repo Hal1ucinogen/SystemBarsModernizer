@@ -138,6 +138,57 @@ class AppConfigEditViewModel(
         isModified = true
     }
 
+    fun isActivityValid(activityName: String): Boolean {
+        if (activityName.endsWith("*")) return true
+        val declared = _declaredActivities.value ?: return true
+        if (declared.isEmpty()) return true
+        if (declared.contains(activityName)) return true
+        if (activityName.contains("$") && declared.contains(activityName.substringBefore("$"))) return true
+        return false
+    }
+
+    fun cleanInvalidRules(): Int {
+        val currentConfig = _draftConfig.value ?: return 0
+        var cleanedCount = 0
+
+        // Clean scope rules
+        val originalScope = currentConfig.scope
+        val validScope = originalScope.filterKeys { isActivityValid(it) }
+        cleanedCount += (originalScope.size - validScope.size)
+
+        // Clean exclusive list
+        val originalGeneral = currentConfig.general
+        val updatedGeneral = if (originalGeneral != null) {
+            val validExclusive = originalGeneral.exclusive.filter { isActivityValid(it) }
+            cleanedCount += (originalGeneral.exclusive.size - validExclusive.size)
+            originalGeneral.copy(exclusive = validExclusive)
+        } else null
+
+        if (cleanedCount > 0) {
+            _draftConfig.value = currentConfig.copy(
+                scope = validScope,
+                general = updatedGeneral
+            )
+            isModified = true
+        }
+        return cleanedCount
+    }
+
+    fun migrateScopeRule(oldActivityName: String, newActivityName: String, pageConfig: PageConfig) {
+        val currentConfig = _draftConfig.value ?: AppConfig(
+            packageName = packageName,
+            configVersion = 1,
+            scope = emptyMap()
+        )
+        val newScope = currentConfig.scope.toMutableMap()
+        if (oldActivityName != newActivityName) {
+            newScope.remove(oldActivityName)
+        }
+        newScope[newActivityName] = pageConfig
+        _draftConfig.value = currentConfig.copy(scope = newScope)
+        isModified = true
+    }
+
     fun resetToDefault() {
         val defaultConfig = DefaultConfigs.configs.firstOrNull { it.packageName == packageName }
         _draftConfig.value = defaultConfig ?: AppConfig(

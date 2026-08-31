@@ -85,6 +85,11 @@
     <string name="msg_config_saved">配置已保存并同步推送至 LSPosed</string>
     <string name="msg_config_reset">配置已重置为默认</string>
     <string name="msg_config_cleared">配置已清空</string>
+    <string name="badge_activity_missing">未在清单中找到</string>
+    <string name="action_clean_invalid_rules">清理失效规则</string>
+    <string name="btn_change_activity">更换 Activity</string>
+    <string name="msg_clean_invalid_rules_success">已清理 %1$d 条失效规则</string>
+    <string name="msg_clean_invalid_rules_empty">未发现失效规则</string>
     
     <!-- Config Edit & Detail Actions -->
     <string name="title_app_config_edit">编辑配置</string>

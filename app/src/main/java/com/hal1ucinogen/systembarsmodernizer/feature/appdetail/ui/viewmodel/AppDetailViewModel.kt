@@ -51,6 +51,15 @@ class AppDetailViewModel(
         _declaredActivities.postValue(activities)
     }
 
+    fun isActivityValid(activityName: String): Boolean {
+        if (activityName.endsWith("*")) return true
+        val declared = _declaredActivities.value ?: return true
+        if (declared.isEmpty()) return true
+        if (declared.contains(activityName)) return true
+        if (activityName.contains("$") && declared.contains(activityName.substringBefore("$"))) return true
+        return false
+    }
+
     fun createConfig() {
         val current = _appItem.value ?: return
         val defaultConfig = com.hal1ucinogen.systembarsmodernizer.feature.applist.data.source.DefaultConfigs.configs.firstOrNull { it.packageName == packageName }

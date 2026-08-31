@@ -68,6 +68,21 @@
                     android:textSize="10sp"
                     tools:text="ExtraActions: 2" />
 
+                <TextView
+                    android:id="@+id/badge_invalid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_badge_secondary"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    android:text="@string/badge_activity_missing"
+                    android:textColor="?attr/colorError"
+                    android:textSize="10sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
             </LinearLayout>
 
         </LinearLayout>

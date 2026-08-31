@@ -85,6 +85,11 @@
     <string name="msg_config_saved">Configuration saved and synced to LSPosed</string>
     <string name="msg_config_reset">Configuration reset to default</string>
     <string name="msg_config_cleared">Configuration cleared</string>
+    <string name="badge_activity_missing">Missing</string>
+    <string name="action_clean_invalid_rules">Clean Invalid Rules</string>
+    <string name="btn_change_activity">Change</string>
+    <string name="msg_clean_invalid_rules_success">Cleaned %1$d invalid rule(s)</string>
+    <string name="msg_clean_invalid_rules_empty">No invalid rules found</string>
     
     <!-- Config Edit & Detail Actions -->
     <string name="title_app_config_edit">Edit Configuration</string>

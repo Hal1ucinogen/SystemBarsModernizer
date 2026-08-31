@@ -1,6 +1,7 @@
 package com.hal1ucinogen.systembarsmodernizer.feature.applist.data.repository
 
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import com.hal1ucinogen.systembarsmodernizer.app.SystemServices
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1ucinogen.systembarsmodernizer.compat.PackageManagerCompat
@@ -22,7 +23,9 @@ class AppListRepository(private val sbmItemDao: SBMItemDao) {
     }
 
     suspend fun refreshAppList() = withContext(Dispatchers.IO) {
-        val installedPackages = PackageManagerCompat.getInstalledPackages(0)
+        val installedPackages = PackageManagerCompat.getInstalledPackages(
+            PackageManager.GET_ACTIVITIES or PackageManager.MATCH_DISABLED_COMPONENTS
+        )
         val existingItemsMap = sbmItemDao.getAllItemsSync().associateBy { it.packageName }
         val defaultConfigsMap = DefaultConfigs.configs.associateBy { it.packageName }
 
@@ -37,6 +40,7 @@ class AppListRepository(private val sbmItemDao: SBMItemDao) {
             val existingItem = existingItemsMap[packageName]
             val defaultConfig = defaultConfigsMap[packageName]
             val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+            val hasActivities = !packageInfo.activities.isNullOrEmpty()
 
             val item = if (existingItem != null) {
                 // Keep user's custom configuration, update app metadata
@@ -65,7 +69,7 @@ class AppListRepository(private val sbmItemDao: SBMItemDao) {
                 )
             }
 
-            if (item.features > 0 || !item.isSystem) {
+            if (item.features > 0 || (!item.isSystem && hasActivities)) {
                 updatedList.add(item)
             }
         }
@@ -80,12 +84,13 @@ class AppListRepository(private val sbmItemDao: SBMItemDao) {
         // Batch save to Room database without clearing existing configurations
         sbmItemDao.insertItems(updatedList)
 
-        // Clean up uninstalled apps that have no configuration
-        val uninstalledWithoutConfig = existingItemsMap.filter { (pkg, item) ->
-            !installedPackageNames.contains(pkg) && item.features <= 0
+        // Clean up entries in database that are no longer valid (e.g. uninstalled or has no activities) and have no configuration
+        val validPackageNames = updatedList.map { it.packageName }.toSet()
+        val invalidWithoutConfig = existingItemsMap.filter { (pkg, item) ->
+            !validPackageNames.contains(pkg) && item.features <= 0
         }.keys.toList()
-        if (uninstalledWithoutConfig.isNotEmpty()) {
-            sbmItemDao.deleteByPackageNames(uninstalledWithoutConfig)
+        if (invalidWithoutConfig.isNotEmpty()) {
+            sbmItemDao.deleteByPackageNames(invalidWithoutConfig)
         }
     }
 
