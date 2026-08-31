@@ -87,4 +87,30 @@ object UiUtils {
         DrawableCompat.setTint(drawable, color)
         return drawable
     }
+
+    fun createBadge(
+        context: Context,
+        text: CharSequence,
+        isPrimary: Boolean = false,
+        isError: Boolean = false
+    ): android.widget.TextView {
+        val density = context.resources.displayMetrics.density
+        val hPad = (8 * density).toInt()
+        val vPad = (3 * density).toInt()
+        return android.widget.TextView(context).apply {
+            this.text = text
+            textSize = 11f
+            typeface = android.graphics.Typeface.create(if (isPrimary) "sans-serif-medium" else "sans-serif", android.graphics.Typeface.NORMAL)
+            setBackgroundResource(if (isPrimary) com.hal1ucinogen.systembarsmodernizer.R.drawable.bg_badge_primary else com.hal1ucinogen.systembarsmodernizer.R.drawable.bg_badge_secondary)
+            setPadding(hPad, vPad, hPad, vPad)
+            val typedValue = android.util.TypedValue()
+            val colorAttr = when {
+                isPrimary -> com.google.android.material.R.attr.colorOnPrimaryContainer
+                isError -> com.google.android.material.R.attr.colorError
+                else -> com.google.android.material.R.attr.colorOnSurfaceVariant
+            }
+            context.theme.resolveAttribute(colorAttr, typedValue, true)
+            setTextColor(typedValue.data)
+        }
+    }
 }

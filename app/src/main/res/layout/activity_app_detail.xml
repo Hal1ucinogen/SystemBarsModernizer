@@ -239,7 +239,9 @@
                             android:id="@+id/chip_group_exclusive"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp" />
+                            android:layout_marginTop="6dp"
+                            app:chipSpacingHorizontal="6dp"
+                            app:chipSpacingVertical="4dp" />
 
                     </LinearLayout>
 
@@ -308,7 +310,7 @@
         android:text="@string/btn_edit_config"
         android:visibility="gone"
         app:layout_fitsSystemWindowsInsets="bottom|end"
-        app:icon="@android:drawable/ic_menu_edit"
+        app:icon="@drawable/ic_edit"
         tools:visibility="visible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -70,13 +70,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(), Se
                         scheduleAppbarLiftingStatus(!top)
                     }
                 }
-            if (itemDecorationCount == 0) {
-                addItemDecoration(
-                    HorizontalSpacesItemDecoration(
-                        resources.getDimension(R.dimen.normal_padding).toInt() / 2
-                    )
-                )
-            }
             setHasFixedSize(true)
             FastScrollerBuilder(this).useDefaultStyle().build()
         }

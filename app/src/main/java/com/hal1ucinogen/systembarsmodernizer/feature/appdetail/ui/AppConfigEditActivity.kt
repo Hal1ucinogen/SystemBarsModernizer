@@ -22,6 +22,8 @@ import com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui.dialog.Activit
 import com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui.dialog.PageConfigEditDialog
 import com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui.viewmodel.AppConfigEditViewModel
 import com.hal1ucinogen.systembarsmodernizer.ui.base.BaseActivity
+import com.hal1ucinogen.systembarsmodernizer.util.PackageUtils
+import com.hal1ucinogen.systembarsmodernizer.util.UiUtils
 import kotlinx.coroutines.launch
 
 class AppConfigEditActivity : BaseActivity<ActivityAppConfigEditBinding>() {
@@ -90,7 +92,7 @@ class AppConfigEditActivity : BaseActivity<ActivityAppConfigEditBinding>() {
         binding.btnEditGeneralPageConfig.setOnClickListener {
             val general = viewModel.draftConfig.value?.general
             val pageConfig = general?.config ?: PageConfig(edgeToEdge = true)
-            PageConfigEditDialog("通用属性 (General)", pageConfig) { _, updatedConfig ->
+            PageConfigEditDialog(getString(R.string.label_general_properties), pageConfig) { _, updatedConfig ->
                 viewModel.updateGeneralPageConfig(updatedConfig)
             }.show(supportFragmentManager, "PageConfigEditDialog_General")
         }
@@ -125,6 +127,8 @@ class AppConfigEditActivity : BaseActivity<ActivityAppConfigEditBinding>() {
             binding.ivAppIcon.load(item) { crossfade(true) }
             binding.tvAppName.text = item.label
             binding.tvPackageName.text = item.packageName
+            val versionStr = PackageUtils.getVersionString(item.versionName, item.versionCode)
+            binding.tvVersionInfo.text = "$versionStr • Target API ${item.targetApi}"
         }
 
         viewModel.draftConfig.observe(this) { config ->
@@ -160,57 +164,54 @@ class AppConfigEditActivity : BaseActivity<ActivityAppConfigEditBinding>() {
             // General badges
             binding.chipGroupGeneralBadges.removeAllViews()
 
-            val e2eChip = Chip(this).apply {
-                text = if (general.config.edgeToEdge) {
-                    getString(R.string.state_global_e2e_enabled)
-                } else {
-                    getString(R.string.state_global_e2e_disabled)
-                }
-                isEnabled = false
+            val isE2e = general.config.edgeToEdge
+            val e2eText = if (isE2e) {
+                getString(R.string.state_global_e2e_enabled)
+            } else {
+                getString(R.string.state_global_e2e_disabled)
             }
-            binding.chipGroupGeneralBadges.addView(e2eChip)
+            binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, e2eText, isPrimary = isE2e))
 
             general.config.windowBackgroundColor?.let { color ->
-                val colorChip = Chip(this).apply {
-                    text = String.format("窗口背景: #%06X", 0xFFFFFF and color)
-                    isEnabled = false
-                }
-                binding.chipGroupGeneralBadges.addView(colorChip)
+                val text = String.format("%s: #%06X", getString(R.string.field_window_bg_color), 0xFFFFFF and color)
+                binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, text))
             }
 
             if (general.config.clearTranslucent) {
-                val clearChip = Chip(this).apply {
-                    text = getString(R.string.switch_clear_translucent)
-                    isEnabled = false
-                }
-                binding.chipGroupGeneralBadges.addView(clearChip)
+                binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, getString(R.string.switch_clear_translucent)))
             }
 
             if (general.config.extraActions.isNotEmpty()) {
-                val actionsChip = Chip(this).apply {
-                    text = "ExtraActions: ${general.config.extraActions.size}"
-                    isEnabled = false
-                }
-                binding.chipGroupGeneralBadges.addView(actionsChip)
+                val text = "${getString(R.string.section_extra_actions)}: ${general.config.extraActions.size}"
+                binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, text))
             }
 
             // Exclusive Activities Chips
             binding.chipGroupExclusive.removeAllViews()
             val exclusiveList = general.exclusive
             if (exclusiveList.isEmpty()) {
-                val emptyChip = Chip(this).apply {
-                    text = getString(R.string.no_exclusive_activities)
-                    isEnabled = false
-                }
-                binding.chipGroupExclusive.addView(emptyChip)
+                binding.tvEmptyExclusive.visibility = View.VISIBLE
+                binding.chipGroupExclusive.visibility = View.GONE
             } else {
+                binding.tvEmptyExclusive.visibility = View.GONE
+                binding.chipGroupExclusive.visibility = View.VISIBLE
+                val density = resources.displayMetrics.density
                 exclusiveList.forEach { activityName ->
                     val isInvalid = !viewModel.isActivityValid(activityName)
                     val simpleName = activityName.substringAfterLast(".")
                     val chip = Chip(this).apply {
                         text = if (isInvalid) "$simpleName (${getString(R.string.badge_activity_missing)})" else simpleName
+                        textSize = 11.5f
+                        chipMinHeight = 26f * density
+                        setEnsureMinTouchTargetSize(false)
+                        chipStartPadding = 8f * density
+                        chipEndPadding = 4f * density
+                        textStartPadding = 0f
+                        textEndPadding = 2f * density
+                        closeIconSize = 14f * density
+                        chipCornerRadius = 6f * density
                         if (isInvalid) {
-                            alpha = 0.6f
+                            alpha = 0.7f
                         }
                         isCloseIconVisible = true
                         setOnCloseIconClickListener {
@@ -255,20 +256,13 @@ class AppConfigEditActivity : BaseActivity<ActivityAppConfigEditBinding>() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menu?.add(0, 1, 0, R.string.action_save)?.setIcon(android.R.drawable.ic_menu_save)
-            ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        menu?.add(0, 4, 1, R.string.action_clean_invalid_rules)?.setIcon(android.R.drawable.ic_menu_agenda)
-            ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-        menu?.add(0, 2, 2, R.string.action_reset_default)?.setIcon(android.R.drawable.ic_menu_revert)
-            ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-        menu?.add(0, 3, 3, R.string.action_clear_config)?.setIcon(android.R.drawable.ic_menu_delete)
-            ?.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        menuInflater.inflate(R.menu.app_config_edit_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            1 -> {
+            R.id.action_save -> {
                 lifecycleScope.launch {
                     val success = viewModel.save()
                     if (success) {
@@ -278,23 +272,23 @@ class AppConfigEditActivity : BaseActivity<ActivityAppConfigEditBinding>() {
                 }
                 return true
             }
-            2 -> {
-                viewModel.resetToDefault()
-                Toast.makeText(this, R.string.msg_config_reset, Toast.LENGTH_SHORT).show()
-                return true
-            }
-            3 -> {
-                viewModel.clearAll()
-                Toast.makeText(this, R.string.msg_config_cleared, Toast.LENGTH_SHORT).show()
-                return true
-            }
-            4 -> {
+            R.id.action_clean_invalid_rules -> {
                 val cleaned = viewModel.cleanInvalidRules()
                 if (cleaned > 0) {
                     Toast.makeText(this, getString(R.string.msg_clean_invalid_rules_success, cleaned), Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, R.string.msg_clean_invalid_rules_empty, Toast.LENGTH_SHORT).show()
                 }
+                return true
+            }
+            R.id.action_reset_default -> {
+                viewModel.resetToDefault()
+                Toast.makeText(this, R.string.msg_config_reset, Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.action_clear_config -> {
+                viewModel.clearAll()
+                Toast.makeText(this, R.string.msg_config_cleared, Toast.LENGTH_SHORT).show()
                 return true
             }
         }

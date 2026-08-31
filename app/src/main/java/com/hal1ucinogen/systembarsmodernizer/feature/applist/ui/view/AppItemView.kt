@@ -1,20 +1,19 @@
 package com.hal1ucinogen.systembarsmodernizer.feature.applist.ui.view
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.marginStart
-import com.google.android.material.card.MaterialCardView
 import com.hal1ucinogen.systembarsmodernizer.R
 import com.hal1ucinogen.systembarsmodernizer.util.dp
 import com.hal1ucinogen.systembarsmodernizer.util.getColor
@@ -23,11 +22,12 @@ import com.hal1ucinogen.systembarsmodernizer.util.getDimensionPixelSize
 import com.hal1ucinogen.systembarsmodernizer.util.getDrawable
 import com.hal1ucinogen.systembarsmodernizer.view.AViewGroup
 
-class AppItemView(context: Context) : MaterialCardView(context) {
+class AppItemView(context: Context) : FrameLayout(context) {
 
     val container = AppItemContainerView(context).apply {
-        val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
-        setPadding(padding, padding, padding, padding)
+        val hPadding = 16.dp
+        val vPadding = 10.dp
+        setPadding(hPadding, vPadding, hPadding, vPadding)
     }
 
     private val floatView by lazy {
@@ -50,16 +50,9 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     }
 
     init {
-        radius = context.resources.getDimension(R.dimen.main_card_corner_radius)
-        cardElevation = 0f
-        strokeWidth = 0
-        strokeColor = Color.TRANSPARENT
-        val cardBgColor = runCatching {
-            context.getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainerLow)
-        }.getOrElse {
-            context.getColorByAttr(com.google.android.material.R.attr.colorSurfaceVariant)
-        }
-        setCardBackgroundColor(cardBgColor)
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+        setBackgroundResource(typedValue.resourceId)
         isClickable = true
         isFocusable = true
         addView(container)
@@ -93,8 +86,9 @@ class AppItemView(context: Context) : MaterialCardView(context) {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             ).also {
-                it.marginStart = 12.dp
+                it.marginStart = 16.dp
             }
+            includeFontPadding = false
             setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 15.5f)
             maxLines = 1
@@ -113,6 +107,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
+                includeFontPadding = false
                 setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f)
                 ellipsize = TextUtils.TruncateAt.END
@@ -130,6 +125,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+            includeFontPadding = false
             val outlineColor = runCatching {
                 context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
             }.getOrElse {
@@ -152,6 +148,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+            includeFontPadding = false
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
             setPadding(8.dp, 3.dp, 8.dp, 3.dp)
             maxLines = 1
@@ -169,6 +166,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+            includeFontPadding = false
             setPadding(0, 0, 0, 2.dp)
             setTextColor(android.R.color.darker_gray.getColor(context))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)

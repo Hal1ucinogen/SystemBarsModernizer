@@ -67,15 +67,18 @@
                     android:textSize="13sp"
                     tools:text="LSPosed v1.9.3 (7244) • LibXposed API 102" />
 
-                <com.google.android.material.chip.Chip
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/chip_scope"
-                    style="@style/Widget.Material3.Chip.Assist.Elevated"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginTop="10dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     android:textSize="12sp"
                     android:visibility="gone"
                     tools:text="Scope: 12 apps"
@@ -188,7 +191,7 @@
             android:layout_marginBottom="16dp"
             android:orientation="horizontal">
 
-            <!-- Card 3: Global E2E Apps -->
+            <!-- Card 3: General E2E Apps -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

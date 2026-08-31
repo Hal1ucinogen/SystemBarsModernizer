@@ -38,32 +38,23 @@ class PageConfigDetailDialog(
         binding.chipGroupProperties.removeAllViews()
 
         // 1. Edge-to-Edge
-        val e2eChip = Chip(requireContext()).apply {
-            text = if (config.edgeToEdge) {
-                getString(R.string.state_global_e2e_enabled)
-            } else {
-                getString(R.string.state_global_e2e_disabled)
-            }
-            isEnabled = false
+        val isE2e = config.edgeToEdge
+        val e2eText = if (isE2e) {
+            getString(R.string.state_global_e2e_enabled)
+        } else {
+            getString(R.string.state_global_e2e_disabled)
         }
-        binding.chipGroupProperties.addView(e2eChip)
+        binding.chipGroupProperties.addView(com.hal1ucinogen.systembarsmodernizer.util.UiUtils.createBadge(requireContext(), e2eText, isPrimary = isE2e))
 
         // 2. Window Background Color
         config.windowBackgroundColor?.let { color ->
-            val colorChip = Chip(requireContext()).apply {
-                text = String.format("窗口背景: #%06X", 0xFFFFFF and color)
-                isEnabled = false
-            }
-            binding.chipGroupProperties.addView(colorChip)
+            val text = String.format("%s: #%06X", getString(R.string.field_window_bg_color), 0xFFFFFF and color)
+            binding.chipGroupProperties.addView(com.hal1ucinogen.systembarsmodernizer.util.UiUtils.createBadge(requireContext(), text))
         }
 
         // 3. Clear Translucent
         if (config.clearTranslucent) {
-            val clearChip = Chip(requireContext()).apply {
-                text = getString(R.string.switch_clear_translucent)
-                isEnabled = false
-            }
-            binding.chipGroupProperties.addView(clearChip)
+            binding.chipGroupProperties.addView(com.hal1ucinogen.systembarsmodernizer.util.UiUtils.createBadge(requireContext(), getString(R.string.switch_clear_translucent)))
         }
 
         // 4. Extra Actions List (Read-Only)

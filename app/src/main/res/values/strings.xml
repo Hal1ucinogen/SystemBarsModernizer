@@ -18,8 +18,8 @@
     <!-- App List Badges -->
     <string name="badge_uninstalled">Uninstalled</string>
     <string name="badge_system">System</string>
-    <string name="badge_global_edge_to_edge">Edge-to-Edge</string>
-    <string name="badge_global_with_pages">Global + %1$d Pages</string>
+    <string name="badge_global_edge_to_edge">General</string>
+    <string name="badge_global_with_pages">General + %1$d Pages</string>
     <string name="badge_scope_configs">Configs (%1$d)</string>
 
     <!-- App Detail -->
@@ -29,11 +29,12 @@
     <string name="btn_create_config">Create Configuration</string>
 
     <string name="section_general_config">General Configuration</string>
-    <string name="desc_general_config">Global configuration applied across the entire app, except excluded pages.</string>
+    <string name="desc_general_config">General configuration applied across the entire app, except excluded pages.</string>
     <string name="no_general_config">No General Configuration</string>
     <string name="desc_no_general_config">This app relies solely on page-specific configurations or system defaults.</string>
     <string name="switch_enable_general">Enable General Configuration</string>
     <string name="switch_global_edge_to_edge">Edge-to-Edge</string>
+    <string name="label_general_properties">General Properties</string>
     <string name="btn_edit_general_page_config">Edit General Properties</string>
     <string name="exclusive_activities">Excluded Activities</string>
     <string name="btn_add_exclusive">Add Excluded Page</string>
@@ -61,6 +62,7 @@
     <string name="switch_edge_to_edge">Edge-to-Edge</string>
     <string name="switch_clear_translucent">Clear Translucent Flags</string>
     <string name="field_window_bg_color">Window Background Color</string>
+    <string name="hint_window_bg_color">e.g. #FFFFFF or leave blank</string>
     <string name="section_extra_actions">Extra View Actions</string>
     <string name="btn_add_extra_action">Add View Action</string>
     <string name="no_extra_actions">No extra view actions</string>
@@ -144,12 +146,12 @@
     <string name="overview_section_stats">Configuration Statistics</string>
     <string name="overview_stat_configured_apps">Configured Apps</string>
     <string name="overview_stat_scope_rules">Page Configs</string>
-    <string name="overview_stat_global_e2e">Global Edge-to-Edge</string>
+    <string name="overview_stat_global_e2e">General Configs</string>
     <string name="overview_stat_extra_actions">Extra View Actions</string>
     <string name="overview_section_guide">Quick Guide</string>
     <string name="overview_btn_view_app_list">View App Configurations</string>
     <string name="overview_guide_step1">1. Select a target application from the App List.</string>
-    <string name="overview_guide_step2">2. Enable Global Edge-to-Edge or fine-tune page-specific View insets.</string>
+    <string name="overview_guide_step2">2. Configure general properties or add page-specific configurations as needed (Edge-to-Edge, background, view insets, etc.).</string>
     <string name="overview_guide_step3">3. Save configurations, then force stop and restart the target app to apply changes.</string>
     
     <!-- Scope List Dialog -->

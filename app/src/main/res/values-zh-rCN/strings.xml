@@ -18,8 +18,8 @@
     <!-- App List Badges -->
     <string name="badge_uninstalled">已卸载</string>
     <string name="badge_system">系统</string>
-    <string name="badge_global_edge_to_edge">全局边到边</string>
-    <string name="badge_global_with_pages">全局 + %1$d 页</string>
+    <string name="badge_global_edge_to_edge">通用</string>
+    <string name="badge_global_with_pages">通用 + %1$d 页</string>
     <string name="badge_scope_configs">配置 (%1$d)</string>
 
     <!-- App Detail -->
@@ -29,11 +29,12 @@
     <string name="btn_create_config">创建配置</string>
 
     <string name="section_general_config">通用配置</string>
-    <string name="desc_general_config">应用于整个应用的全局配置（排除页面除外）。</string>
+    <string name="desc_general_config">应用于整个应用的通用配置（排除页面除外）。</string>
     <string name="no_general_config">未启用通用配置</string>
     <string name="desc_no_general_config">该应用仅依赖特定页面规则或系统默认表现。</string>
     <string name="switch_enable_general">启用通用配置</string>
     <string name="switch_global_edge_to_edge">边到边</string>
+    <string name="label_general_properties">通用属性</string>
     <string name="btn_edit_general_page_config">编辑通用属性</string>
     <string name="exclusive_activities">排除的页面</string>
     <string name="btn_add_exclusive">添加排除页面</string>
@@ -61,7 +62,8 @@
     <string name="switch_edge_to_edge">边到边</string>
     <string name="switch_clear_translucent">清除半透明标记</string>
     <string name="field_window_bg_color">窗口背景颜色</string>
-    <string name="section_extra_actions">附加视图动作 (ExtraAction)</string>
+    <string name="hint_window_bg_color">如 #FFFFFF 或留空</string>
+    <string name="section_extra_actions">附加视图调整 (Extra Actions)</string>
     <string name="btn_add_extra_action">添加视图动作</string>
     <string name="no_extra_actions">暂无附加视图动作</string>
     
@@ -143,13 +145,13 @@
     <string name="overview_scope_count">已生效作用域: %1$d 个应用</string>
     <string name="overview_section_stats">配置统计</string>
     <string name="overview_stat_configured_apps">已配置应用</string>
-    <string name="overview_stat_scope_rules">页面规则数</string>
-    <string name="overview_stat_global_e2e">全局边到边</string>
+    <string name="overview_stat_scope_rules">页面配置</string>
+    <string name="overview_stat_global_e2e">通用配置</string>
     <string name="overview_stat_extra_actions">附加视图动作</string>
     <string name="overview_section_guide">快速上手</string>
     <string name="overview_btn_view_app_list">查看应用配置</string>
     <string name="overview_guide_step1">1. 在应用列表中选择需要配置的目标应用。</string>
-    <string name="overview_guide_step2">2. 开启全局边到边或针对特定页面调整视图边距。</string>
+    <string name="overview_guide_step2">2. 按需设置通用配置或针对特定页面单独定制（支持边到边、窗口背景及视图调整等）。</string>
     <string name="overview_guide_step3">3. 保存配置后，强行停止并重新打开目标应用以使更改生效。</string>
     
     <!-- Scope List Dialog -->

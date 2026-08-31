@@ -6,7 +6,6 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
-import com.google.android.material.chip.Chip
 import com.hal1ucinogen.systembarsmodernizer.R
 import com.hal1ucinogen.systembarsmodernizer.SBMApp
 import com.hal1ucinogen.systembarsmodernizer.databinding.ActivityAppDetailBinding
@@ -15,6 +14,7 @@ import com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui.adapter.ScopeR
 import com.hal1ucinogen.systembarsmodernizer.feature.appdetail.ui.viewmodel.AppDetailViewModel
 import com.hal1ucinogen.systembarsmodernizer.ui.base.BaseActivity
 import com.hal1ucinogen.systembarsmodernizer.util.PackageUtils
+import com.hal1ucinogen.systembarsmodernizer.util.UiUtils
 
 class AppDetailActivity : BaseActivity<ActivityAppDetailBinding>() {
 
@@ -122,66 +122,33 @@ class AppDetailActivity : BaseActivity<ActivityAppDetailBinding>() {
                     binding.chipGroupGeneralBadges.removeAllViews()
 
                     // 1. Edge-to-Edge Badge
-                    val e2eChip = Chip(this).apply {
-                        text = if (general.config.edgeToEdge) {
-                            getString(R.string.state_global_e2e_enabled)
-                        } else {
-                            getString(R.string.state_global_e2e_disabled)
-                        }
-                        isEnabled = false
+                    val isE2e = general.config.edgeToEdge
+                    val e2eText = if (isE2e) {
+                        getString(R.string.state_global_e2e_enabled)
+                    } else {
+                        getString(R.string.state_global_e2e_disabled)
                     }
-                    binding.chipGroupGeneralBadges.addView(e2eChip)
+                    binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, e2eText, isPrimary = isE2e))
 
                     // 2. Window Background Color Badge
                     general.config.windowBackgroundColor?.let { color ->
-                        val colorChip = Chip(this).apply {
-                            text = String.format("窗口背景: #%06X", 0xFFFFFF and color)
-                            isEnabled = false
-                        }
-                        binding.chipGroupGeneralBadges.addView(colorChip)
+                        val text = String.format("%s: #%06X", getString(R.string.field_window_bg_color), 0xFFFFFF and color)
+                        binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, text))
                     }
 
                     // 3. Clear Translucent Badge
                     if (general.config.clearTranslucent) {
-                        val clearChip = Chip(this).apply {
-                            text = getString(R.string.switch_clear_translucent)
-                            isEnabled = false
-                        }
-                        binding.chipGroupGeneralBadges.addView(clearChip)
+                        binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, getString(R.string.switch_clear_translucent)))
                     }
 
                     // 4. Extra Actions Badge
                     if (general.config.extraActions.isNotEmpty()) {
-                        val actionsChip = Chip(this).apply {
-                            text = "ExtraActions: ${general.config.extraActions.size}"
-                            isEnabled = false
-                        }
-                        binding.chipGroupGeneralBadges.addView(actionsChip)
+                        val text = "${getString(R.string.section_extra_actions)}: ${general.config.extraActions.size}"
+                        binding.chipGroupGeneralBadges.addView(UiUtils.createBadge(this, text))
                     }
 
                     // Exclusive Activities Chips (Read-Only)
-                    binding.chipGroupExclusive.removeAllViews()
-                    val exclusiveList = general.exclusive
-                    if (exclusiveList.isEmpty()) {
-                        val emptyChip = Chip(this).apply {
-                            text = getString(R.string.no_exclusive_activities)
-                            isEnabled = false
-                        }
-                        binding.chipGroupExclusive.addView(emptyChip)
-                    } else {
-                        exclusiveList.forEach { activityName ->
-                            val isInvalid = !viewModel.isActivityValid(activityName)
-                            val simpleName = activityName.substringAfterLast(".")
-                            val chip = Chip(this).apply {
-                                text = if (isInvalid) "$simpleName (${getString(R.string.badge_activity_missing)})" else simpleName
-                                if (isInvalid) {
-                                    alpha = 0.6f
-                                }
-                                isCloseIconVisible = false
-                            }
-                            binding.chipGroupExclusive.addView(chip)
-                        }
-                    }
+                    renderExclusiveActivities(general.exclusive)
                 } else {
                     binding.cardGeneralConfig.visibility = View.GONE
                 }
@@ -212,21 +179,25 @@ class AppDetailActivity : BaseActivity<ActivityAppDetailBinding>() {
                     scopeRuleAdapter.setList(scopeRules.toMutableList())
                 }
                 val general = config.general
-                if (general != null && general.exclusive.isNotEmpty()) {
-                    binding.chipGroupExclusive.removeAllViews()
-                    general.exclusive.forEach { activityName ->
-                        val isInvalid = !viewModel.isActivityValid(activityName)
-                        val simpleName = activityName.substringAfterLast(".")
-                        val chip = Chip(this).apply {
-                            text = if (isInvalid) "$simpleName (${getString(R.string.badge_activity_missing)})" else simpleName
-                            if (isInvalid) {
-                                alpha = 0.6f
-                            }
-                            isCloseIconVisible = false
-                        }
-                        binding.chipGroupExclusive.addView(chip)
-                    }
+                if (general != null) {
+                    renderExclusiveActivities(general.exclusive)
                 }
+            }
+        }
+    }
+
+    private fun renderExclusiveActivities(exclusiveList: List<String>) {
+        binding.chipGroupExclusive.removeAllViews()
+        if (exclusiveList.isEmpty()) {
+            binding.layoutExclusive.visibility = View.GONE
+        } else {
+            binding.layoutExclusive.visibility = View.VISIBLE
+            exclusiveList.forEach { activityName ->
+                val isInvalid = !viewModel.isActivityValid(activityName)
+                val simpleName = activityName.substringAfterLast(".")
+                val text = if (isInvalid) "$simpleName (${getString(R.string.badge_activity_missing)})" else simpleName
+                val badge = UiUtils.createBadge(this, text, isError = isInvalid)
+                binding.chipGroupExclusive.addView(badge)
             }
         }
     }

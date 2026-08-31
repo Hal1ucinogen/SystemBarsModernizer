@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/ic_save"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_save"
+        app:iconTint="?attr/colorOnSurface" />
+
+    <item
+        android:id="@+id/action_clean_invalid_rules"
+        android:icon="@drawable/ic_delete_sweep"
+        android:showAsAction="never"
+        android:title="@string/action_clean_invalid_rules"
+        app:iconTint="?attr/colorOnSurface" />
+
+    <item
+        android:id="@+id/action_reset_default"
+        android:icon="@drawable/ic_restart_alt"
+        android:showAsAction="never"
+        android:title="@string/action_reset_default"
+        app:iconTint="?attr/colorOnSurface" />
+
+    <item
+        android:id="@+id/action_clear_config"
+        android:icon="@drawable/ic_delete"
+        android:showAsAction="never"
+        android:title="@string/action_clear_config"
+        app:iconTint="?attr/colorOnSurface" />
+
+</menu>

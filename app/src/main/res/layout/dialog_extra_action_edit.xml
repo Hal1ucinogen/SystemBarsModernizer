@@ -29,13 +29,13 @@
             app:boxCornerRadiusBottomEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp">
+            app:boxCornerRadiusTopStart="12dp"
+            app:placeholderText="@string/hint_view_id">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_view_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_view_id"
                 android:inputType="text"
                 android:textSize="14sp" />
 
@@ -152,13 +152,13 @@
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp">
+                app:boxCornerRadiusTopStart="12dp"
+                app:placeholderText="0">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_custom_inset"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="0"
                     android:inputType="numberSigned"
                     android:textSize="14sp" />
 
@@ -194,13 +194,13 @@
             app:boxCornerRadiusBottomEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp">
+            app:boxCornerRadiusTopStart="12dp"
+            app:placeholderText="-1">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_child_index"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="-1"
                 android:inputType="numberSigned"
                 android:textSize="14sp" />
 
@@ -217,13 +217,13 @@
             app:boxCornerRadiusBottomEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp">
+            app:boxCornerRadiusTopStart="12dp"
+            app:placeholderText="100">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_delay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="100"
                 android:inputType="number"
                 android:textSize="14sp" />
 
