@@ -212,6 +212,8 @@ data class ExtraAction(
   - [ ] 规则在线分享与冲突智能合并（Merge）。
 - [ ] **进阶调试与辅助工具（In-App Inspector）**：
   - [ ] 目标应用内悬浮 View 树抓取与定位辅助工具，一键生成对应 ExtraAction。
+- [ ] **Flutter / 跨端混合框架 Insets 拦截与矫正**：
+  - [ ] 针对 Flutter / FlutterBoost 等自绘引擎，Hook `FlutterJNI.setViewportMetrics` 与 `FlutterView.onApplyWindowInsets`，改写底层 ViewportMetrics 边距，实现跨端页面内部 SafeArea / 底部系统栏占位的高级消除。
 
 ---
 

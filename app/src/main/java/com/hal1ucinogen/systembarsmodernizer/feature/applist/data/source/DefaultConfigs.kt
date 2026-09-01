@@ -23,7 +23,34 @@ object DefaultConfigs {
         AppConfig(
             "com.taobao.idlefish",
             1,
-            mapOf("com.taobao.idlefish.maincontainer.activity.MainActivity" to PageConfig(edgeToEdge = false)),
+            mapOf(
+                "com.taobao.idlefish.maincontainer.activity.MainActivity" to PageConfig(
+                    edgeToEdge = true,
+                    extraActions = listOf(
+                        ExtraAction(
+                            viewId = "decor",
+                            isTop = false,
+                            isPadding = true,
+                            useSystemInsets = true,
+                            isGroup = false,
+                            self = true
+                        )
+                    )
+                ),
+                "com.taobao.idlefish.detail.DetailActivity" to PageConfig(
+                    edgeToEdge = true,
+                    extraActions = listOf(
+                        ExtraAction(
+                            viewId = "decor",
+                            isTop = false,
+                            isPadding = true,
+                            useSystemInsets = true,
+                            isGroup = false,
+                            self = true
+                        )
+                    )
+                )
+            ),
             GeneralConfig(PageConfig(edgeToEdge = true))
         ),
         // 京东
