@@ -67,8 +67,17 @@ class PageConfigEditDialog(
         extraActionAdapter = ExtraActionAdapter { position ->
             if (position in extraActionsList.indices) {
                 extraActionsList.removeAt(position)
-                extraActionAdapter.notifyItemRemoved(position)
+                extraActionAdapter.removeAt(position)
                 updateEmptyState()
+            }
+        }
+
+        extraActionAdapter.setOnItemClickListener { _, _, position ->
+            if (position in extraActionsList.indices) {
+                ExtraActionEditDialog(extraActionsList[position]) { updatedAction ->
+                    extraActionsList[position] = updatedAction
+                    extraActionAdapter.setList(extraActionsList)
+                }.show(childFragmentManager, "ExtraActionEditDialog_Edit")
             }
         }
 
