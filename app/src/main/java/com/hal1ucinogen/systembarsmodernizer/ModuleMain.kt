@@ -23,6 +23,7 @@ import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
 import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
 import com.hal1ucinogen.systembarsmodernizer.tool.Task
 import com.hal1ucinogen.systembarsmodernizer.util.getNavigationHeight
@@ -204,6 +205,20 @@ class ModuleMain : XposedModule() {
         return null
     }
 
+    private fun Activity.getIntentRoute(): String? {
+        val intent = this.intent ?: return null
+        return intent.getStringExtra("url")
+            ?: intent.dataString
+            ?: intent.getStringExtra("ROUTER_URL_DATA")
+    }
+
+    private fun ExtraAction.isRouteMatch(activity: Activity): Boolean {
+        if (routes.isEmpty()) return true
+        val route = activity.getIntentRoute() ?: return isRouteExclusive
+        val matched = routes.any { route.contains(it) }
+        return if (isRouteExclusive) !matched else matched
+    }
+
     private fun handlePaddingIntercept(chain: XposedInterface.Chain): Any? {
         val view = chain.thisObject as? View ?: return chain.proceed()
         val activity = view.context.findActivity() ?: view.rootView?.context?.findActivity()
@@ -212,7 +227,7 @@ class ModuleMain : XposedModule() {
 
         // Fast-Path: 如果页面无 Padding 规则直接放行
         if (pageConfig.extraActions.isEmpty()) return chain.proceed()
-        val paddingActions = pageConfig.extraActions.filter { it.isPadding && !it.isGone }
+        val paddingActions = pageConfig.extraActions.filter { it.isPadding && !it.isGone && it.isRouteMatch(activity) }
         if (paddingActions.isEmpty()) return chain.proceed()
 
         val entryName = if (view.id != View.NO_ID) {
@@ -260,7 +275,7 @@ class ModuleMain : XposedModule() {
 
         // Fast-Path: 如果页面无 isGone 规则直接放行
         if (pageConfig.extraActions.isEmpty()) return chain.proceed()
-        val goneActions = pageConfig.extraActions.filter { it.isGone }
+        val goneActions = pageConfig.extraActions.filter { it.isGone && it.isRouteMatch(activity) }
         if (goneActions.isEmpty()) return chain.proceed()
 
         if (view.id == View.NO_ID) return chain.proceed()
@@ -282,7 +297,7 @@ class ModuleMain : XposedModule() {
 
         // Fast-Path: 如果页面无 Margin 规则直接放行
         if (pageConfig.extraActions.isEmpty()) return chain.proceed()
-        val marginActions = pageConfig.extraActions.filter { !it.isPadding && !it.isGone }
+        val marginActions = pageConfig.extraActions.filter { !it.isPadding && !it.isGone && it.isRouteMatch(activity) }
         if (marginActions.isEmpty()) return chain.proceed()
 
         val entryName = if (view.id != View.NO_ID) {
@@ -328,6 +343,7 @@ class ModuleMain : XposedModule() {
         val activity = chain.thisObject as? Activity ?: return
         val window = activity.window
         log(Log.INFO, TAG, "Activity onCreate | ${activity.javaClass.name}")
+        log(Log.INFO, TAG, "Activity Intent data: ${activity.intent.data}, extras: ${activity.intent.extras?.keySet()?.associateWith { activity.intent.extras?.get(it) }}")
         val pageConfig = getPageConfigFast(activity) ?: return
         log(Log.INFO, TAG, "Activity ${activity.javaClass.name} config | $pageConfig")
         if (pageConfig.edgeToEdge) {
@@ -378,7 +394,7 @@ class ModuleMain : XposedModule() {
 
         // View 级 ExtraAction 执行
         // TODO There is a inset change issue. Try to useViewCompat.setOnApplyWindowInsetsListener instead
-        pageConfig.extraActions.forEach { extraAction ->
+        pageConfig.extraActions.filter { it.isRouteMatch(activity) }.forEach { extraAction ->
             log(Log.INFO, TAG, "In ExtraAction | $extraAction")
             Task.onMain(extraAction.delay) {
                 val target = when (extraAction.viewId) {

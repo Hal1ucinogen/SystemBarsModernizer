@@ -83,6 +83,9 @@
     <string name="switch_self">Apply to Self</string>
     <string name="field_child_index">Child Index (-1 for all/none)</string>
     <string name="field_delay">Action Delay (ms)</string>
+    <string name="field_routes">Route Filter Keywords (comma separated)</string>
+    <string name="hint_routes">e.g. x_chat, session_group</string>
+    <string name="switch_route_exclusive">Exclude Matched Routes (Blacklist)</string>
     
     <string name="msg_config_saved">Configuration saved and synced to LSPosed</string>
     <string name="msg_config_reset">Configuration reset to default</string>

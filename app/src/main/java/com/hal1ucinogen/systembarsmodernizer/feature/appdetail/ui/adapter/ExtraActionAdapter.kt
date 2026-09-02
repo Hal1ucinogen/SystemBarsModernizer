@@ -45,6 +45,10 @@ class ExtraActionAdapter(
             if (item.delay != 100L) {
                 append(" • ${item.delay}ms")
             }
+            if (item.routes.isNotEmpty()) {
+                append(if (item.isRouteExclusive) " • Exclude: " else " • Include: ")
+                append(item.routes.joinToString(", "))
+            }
         }
         tvSummary.text = summary
 

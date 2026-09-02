@@ -24,34 +24,61 @@ object DefaultConfigs {
             "com.taobao.idlefish",
             1,
             mapOf(
-                "com.taobao.idlefish.maincontainer.activity.MainActivity" to PageConfig(
+                "com.taobao.idlefish.webview.WebHybridActivity" to PageConfig(
                     edgeToEdge = true,
                     extraActions = listOf(
                         ExtraAction(
                             viewId = "decor",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 0,
                             isTop = false,
-                            isPadding = true,
-                            useSystemInsets = true,
-                            isGroup = false,
-                            self = true
+                            isPadding = false,
+                            useSystemInsets = false,
+                            customInset = 0
                         )
                     )
                 ),
-                "com.taobao.idlefish.detail.DetailActivity" to PageConfig(
+                "com.taobao.idlefish.search_implement.SearchResultActivity" to PageConfig(
                     edgeToEdge = true,
                     extraActions = listOf(
                         ExtraAction(
                             viewId = "decor",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 0,
                             isTop = false,
-                            isPadding = true,
-                            useSystemInsets = true,
-                            isGroup = false,
-                            self = true
+                            isPadding = false,
+                            useSystemInsets = false,
+                            customInset = 0
+                        )
+                    )
+                ),
+                "com.idlefish.flutterbridge.flutterboost.boost.FishFlutterBoostActivity" to PageConfig(
+                    edgeToEdge = true,
+                    extraActions = listOf(
+                        ExtraAction(
+                            viewId = "decor",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 0,
+                            isTop = false,
+                            isPadding = false,
+                            useSystemInsets = false,
+                            customInset = 0,
+                            routes = listOf("x_chat", "rate_detail", "order_detail_new"),
+                            isRouteExclusive = true
                         )
                     )
                 )
             ),
-            GeneralConfig(PageConfig(edgeToEdge = true))
+            GeneralConfig(
+                PageConfig(edgeToEdge = true),
+                exclusive = listOf(
+                    "com.taobao.idlefish.maincontainer.activity.MainActivity",
+                    "com.taobao.idlefish.detail.DetailActivity"
+                )
+            )
         ),
         // 京东
         AppConfig(

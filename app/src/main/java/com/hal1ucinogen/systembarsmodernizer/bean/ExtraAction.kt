@@ -13,5 +13,7 @@ data class ExtraAction(
     val self: Boolean = true,
     val childIndex: Int = -1,
     val isGone: Boolean = false,
-    val delay: Long = 100L
+    val delay: Long = 100L,
+    val routes: List<String> = emptyList(),
+    val isRouteExclusive: Boolean = false
 )

@@ -83,6 +83,9 @@
     <string name="switch_self">作用于自身</string>
     <string name="field_child_index">子 View 索引（-1 为无/全选）</string>
     <string name="field_delay">动作延迟 (ms)</string>
+    <string name="field_routes">路由过滤关键字（逗号分隔）</string>
+    <string name="hint_routes">例如 x_chat, session_group</string>
+    <string name="switch_route_exclusive">排除匹配的路由（黑名单模式）</string>
     
     <string name="msg_config_saved">配置已保存并同步推送至 LSPosed</string>
     <string name="msg_config_reset">配置已重置为默认</string>

@@ -229,6 +229,37 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Routes Filter -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_routes"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:hint="@string/field_routes"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:placeholderText="@string/hint_routes">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_routes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="14sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_route_exclusive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/switch_route_exclusive"
+            android:textSize="13.5sp" />
+
         <!-- Dialog Buttons -->
         <LinearLayout
             android:layout_width="match_parent"

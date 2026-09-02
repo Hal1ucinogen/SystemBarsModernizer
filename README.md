@@ -121,7 +121,9 @@ data class ExtraAction(
     val self: Boolean = true,          // 是否作用于自身（false 则作用于 childIndex 对应子 View）
     val childIndex: Int = -1,          // 目标子 View 索引（如 0）
     val isGone: Boolean = false,       // 是否强制设为 View.GONE 消除占位 View
-    val delay: Long = 100L             // 动作执行延迟时间（毫秒，默认 100ms）
+    val delay: Long = 100L,            // 动作执行延迟时间（毫秒，默认 100ms）
+    val routes: List<String> = emptyList(), // 路由过滤关键字列表（支持匹配 Intent 中的 url/data）
+    val isRouteExclusive: Boolean = false   // 路由过滤模式（true 为黑名单排除模式，false 为白名单包含模式）
 )
 ```
 
@@ -148,6 +150,15 @@ data class ExtraAction(
   ```kotlin
   // 针对网络返回后才动态插入的容器，设置 500ms 延迟后精准执行
   ExtraAction(viewId = "bottom_floating_bar", isGone = true, delay = 500L)
+  ```
+- **场景 6：混合框架（如 FlutterBoost）基于 Intent 路由黑/白名单过滤**
+  ```kotlin
+  // 针对通用容器 Activity，清空列表页的 Margin，但排除聊天等带底栏的路由页面
+  ExtraAction(
+      viewId = "decor", isGroup = true, self = false, childIndex = 0,
+      isTop = false, isPadding = false, customInset = 0,
+      routes = listOf("x_chat"), isRouteExclusive = true
+  )
   ```
 
 ---

@@ -56,6 +56,10 @@ class ExtraActionEditDialog(
                 binding.etChildIndex.setText(action.childIndex.toString())
             }
             binding.etDelay.setText(action.delay.toString())
+            if (action.routes.isNotEmpty()) {
+                binding.etRoutes.setText(action.routes.joinToString(", "))
+            }
+            binding.switchRouteExclusive.isChecked = action.isRouteExclusive
         } ?: run {
             binding.etDelay.setText("100")
         }
@@ -89,6 +93,11 @@ class ExtraActionEditDialog(
             val self = binding.switchSelf.isChecked
             val childIndex = binding.etChildIndex.text?.toString()?.toIntOrNull() ?: -1
             val delay = binding.etDelay.text?.toString()?.toLongOrNull() ?: 100L
+            val routesStr = binding.etRoutes.text?.toString().orEmpty().trim()
+            val routes = if (routesStr.isNotEmpty()) {
+                routesStr.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+            } else emptyList()
+            val isRouteExclusive = binding.switchRouteExclusive.isChecked
 
             val action = ExtraAction(
                 viewId = viewId,
@@ -100,7 +109,9 @@ class ExtraActionEditDialog(
                 self = self,
                 childIndex = childIndex,
                 isGone = isGone,
-                delay = delay
+                delay = delay,
+                routes = routes,
+                isRouteExclusive = isRouteExclusive
             )
 
             onActionSaved(action)
