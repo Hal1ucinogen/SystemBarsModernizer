@@ -34,11 +34,15 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Decode Keystore
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > sbm.keystore
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > sbm.keystore
+            echo "Keystore decoded successfully."
+          else
+            echo "KEYSTORE_BASE64 secret is not provided, proceeding with unsigned build."
+          fi
 
       - name: Build Release APK
         env:
