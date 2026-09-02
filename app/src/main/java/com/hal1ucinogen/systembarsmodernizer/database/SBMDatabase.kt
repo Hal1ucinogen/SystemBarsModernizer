@@ -10,7 +10,7 @@ import com.hal1ucinogen.systembarsmodernizer.database.converter.ConfigConverters
 import com.hal1ucinogen.systembarsmodernizer.database.dao.SBMItemDao
 import com.hal1ucinogen.systembarsmodernizer.database.entity.SBMItem
 
-@Database(entities = [SBMItem::class], version = 2, exportSchema = false)
+@Database(entities = [SBMItem::class], version = 3, exportSchema = false)
 @TypeConverters(ConfigConverters::class)
 abstract class SBMDatabase : RoomDatabase() {
 

@@ -74,6 +74,7 @@
     <string name="action_type_padding">Apply Padding</string>
     <string name="action_type_margin">Apply Margin</string>
     <string name="action_type_gone">Set View GONE</string>
+    <string name="action_type_invisible">Set View INVISIBLE</string>
     <string name="target_bar">Target System Bar</string>
     <string name="target_bar_status">Top (Status Bar)</string>
     <string name="target_bar_nav">Bottom (Navigation Bar)</string>

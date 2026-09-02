@@ -74,6 +74,7 @@
     <string name="action_type_padding">调整内边距 (Padding)</string>
     <string name="action_type_margin">调整外边距 (Margin)</string>
     <string name="action_type_gone">隐藏视图 (GONE)</string>
+    <string name="action_type_invisible">隐藏视图 (INVISIBLE)</string>
     <string name="target_bar">目标系统栏</string>
     <string name="target_bar_status">顶部（状态栏）</string>
     <string name="target_bar_nav">底部（导航栏）</string>

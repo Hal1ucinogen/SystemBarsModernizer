@@ -24,7 +24,11 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
+import com.hal1ucinogen.systembarsmodernizer.bean.InsetEdge
 import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.SpacingType
+import com.hal1ucinogen.systembarsmodernizer.bean.ViewAction
+import com.hal1ucinogen.systembarsmodernizer.bean.VisibilityMode
 import com.hal1ucinogen.systembarsmodernizer.tool.Task
 import com.hal1ucinogen.systembarsmodernizer.util.getNavigationHeight
 import com.hal1ucinogen.systembarsmodernizer.util.getStatusHeight
@@ -227,7 +231,10 @@ class ModuleMain : XposedModule() {
 
         // Fast-Path: 如果页面无 Padding 规则直接放行
         if (pageConfig.extraActions.isEmpty()) return chain.proceed()
-        val paddingActions = pageConfig.extraActions.filter { it.isPadding && !it.isGone && it.isRouteMatch(activity) }
+        val paddingActions = pageConfig.extraActions.filter {
+            val act = it.action
+            act is ViewAction.Inset && act.spacingType == SpacingType.PADDING && it.isRouteMatch(activity)
+        }
         if (paddingActions.isEmpty()) return chain.proceed()
 
         val entryName = if (view.id != View.NO_ID) {
@@ -248,15 +255,16 @@ class ModuleMain : XposedModule() {
             }
         } ?: return chain.proceed()
 
-        val inset = if (action.useSystemInsets) {
-            if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
+        val insetAction = action.action as ViewAction.Inset
+        val inset = if (insetAction.useSystemInsets) {
+            if (insetAction.edge == InsetEdge.TOP) activity.getStatusHeight() else activity.getNavigationHeight()
         } else {
-            action.customInset
+            insetAction.customInset
         }
 
         var top = chain.args[1] as Int
         var bottom = chain.args[3] as Int
-        if (action.isTop) {
+        if (insetAction.edge == InsetEdge.TOP) {
             top = inset
         } else {
             bottom = inset
@@ -273,19 +281,28 @@ class ModuleMain : XposedModule() {
             ?: return chain.proceed()
         val pageConfig = getPageConfigFast(activity) ?: return chain.proceed()
 
-        // Fast-Path: 如果页面无 isGone 规则直接放行
+        // Fast-Path: 如果页面无 Visibility 规则直接放行
         if (pageConfig.extraActions.isEmpty()) return chain.proceed()
-        val goneActions = pageConfig.extraActions.filter { it.isGone && it.isRouteMatch(activity) }
-        if (goneActions.isEmpty()) return chain.proceed()
+        val visibilityActions = pageConfig.extraActions.filter {
+            it.action is ViewAction.Visibility && it.isRouteMatch(activity)
+        }
+        if (visibilityActions.isEmpty()) return chain.proceed()
 
         if (view.id == View.NO_ID) return chain.proceed()
         val entryName = runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
             ?: return chain.proceed()
 
-        val action = goneActions.firstOrNull { it.viewId == entryName }
+        val action = visibilityActions.firstOrNull { it.viewId == entryName }
             ?: return chain.proceed()
 
-        return chain.proceed(arrayOf(View.GONE))
+        val visAction = action.action as ViewAction.Visibility
+        val targetVisibility = when (visAction.mode) {
+            VisibilityMode.GONE -> View.GONE
+            VisibilityMode.INVISIBLE -> View.INVISIBLE
+            VisibilityMode.VISIBLE -> View.VISIBLE
+        }
+
+        return chain.proceed(arrayOf(targetVisibility))
     }
 
     private fun handleMarginIntercept(chain: XposedInterface.Chain): Any? {
@@ -297,7 +314,10 @@ class ModuleMain : XposedModule() {
 
         // Fast-Path: 如果页面无 Margin 规则直接放行
         if (pageConfig.extraActions.isEmpty()) return chain.proceed()
-        val marginActions = pageConfig.extraActions.filter { !it.isPadding && !it.isGone && it.isRouteMatch(activity) }
+        val marginActions = pageConfig.extraActions.filter {
+            val act = it.action
+            act is ViewAction.Inset && act.spacingType == SpacingType.MARGIN && it.isRouteMatch(activity)
+        }
         if (marginActions.isEmpty()) return chain.proceed()
 
         val entryName = if (view.id != View.NO_ID) {
@@ -318,13 +338,14 @@ class ModuleMain : XposedModule() {
             }
         } ?: return chain.proceed()
 
-        val inset = if (action.useSystemInsets) {
-            if (action.isTop) activity.getStatusHeight() else activity.getNavigationHeight()
+        val insetAction = action.action as ViewAction.Inset
+        val inset = if (insetAction.useSystemInsets) {
+            if (insetAction.edge == InsetEdge.TOP) activity.getStatusHeight() else activity.getNavigationHeight()
         } else {
-            action.customInset
+            insetAction.customInset
         }
 
-        if (action.isTop) {
+        if (insetAction.edge == InsetEdge.TOP) {
             params.topMargin = inset
         } else {
             params.bottomMargin = inset
@@ -434,15 +455,6 @@ class ModuleMain : XposedModule() {
                     }
                 } ?: return@onMain
 
-                val inset = if (extraAction.useSystemInsets) {
-                    if (extraAction.isTop) {
-                        activity.getStatusHeight()
-                    } else {
-                        activity.getNavigationHeight()
-                    }
-                } else {
-                    extraAction.customInset
-                }
                 log(Log.INFO, TAG, "Find Target - $target")
                 log(
                     Log.INFO,
@@ -454,25 +466,41 @@ class ModuleMain : XposedModule() {
                     TAG,
                     "Target Margin - ${target.marginTop}|${target.marginBottom}|${target.marginStart}|${target.marginEnd}"
                 )
-                if (extraAction.isGone) {
-                    target.visibility = View.GONE
-                    target.updateLayoutParams<ViewGroup.LayoutParams> {
-                        height = 0
-                    }
-                } else if (extraAction.isPadding) {
-                    if (extraAction.isTop) {
-                        target.updatePadding(top = inset)
-                    } else {
-                        target.updatePadding(bottom = inset)
-                    }
-                } else {
-                    if (extraAction.isTop) {
-                        target.updateLayoutParams<ViewGroup.LayoutParams> {
-                            (this as? ViewGroup.MarginLayoutParams)?.topMargin = inset
+                when (val act = extraAction.action) {
+                    is ViewAction.Visibility -> {
+                        target.visibility = when (act.mode) {
+                            VisibilityMode.GONE -> View.GONE
+                            VisibilityMode.INVISIBLE -> View.INVISIBLE
+                            VisibilityMode.VISIBLE -> View.VISIBLE
                         }
-                    } else {
-                        target.updateLayoutParams<ViewGroup.LayoutParams> {
-                            (this as? ViewGroup.MarginLayoutParams)?.bottomMargin = inset
+                        if (act.collapseSize) {
+                            target.updateLayoutParams<ViewGroup.LayoutParams> {
+                                height = 0
+                            }
+                        }
+                    }
+                    is ViewAction.Inset -> {
+                        val inset = if (act.useSystemInsets) {
+                            when (act.edge) {
+                                InsetEdge.TOP -> activity.getStatusHeight()
+                                InsetEdge.BOTTOM -> activity.getNavigationHeight()
+                            }
+                        } else {
+                            act.customInset
+                        }
+                        when (act.spacingType) {
+                            SpacingType.PADDING -> when (act.edge) {
+                                InsetEdge.TOP -> target.updatePadding(top = inset)
+                                InsetEdge.BOTTOM -> target.updatePadding(bottom = inset)
+                            }
+                            SpacingType.MARGIN -> when (act.edge) {
+                                InsetEdge.TOP -> target.updateLayoutParams<ViewGroup.LayoutParams> {
+                                    (this as? ViewGroup.MarginLayoutParams)?.topMargin = inset
+                                }
+                                InsetEdge.BOTTOM -> target.updateLayoutParams<ViewGroup.LayoutParams> {
+                                    (this as? ViewGroup.MarginLayoutParams)?.bottomMargin = inset
+                                }
+                            }
                         }
                     }
                 }

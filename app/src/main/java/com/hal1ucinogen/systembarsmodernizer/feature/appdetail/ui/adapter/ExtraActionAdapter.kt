@@ -7,6 +7,9 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.hal1ucinogen.systembarsmodernizer.R
 import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
+import com.hal1ucinogen.systembarsmodernizer.bean.InsetEdge
+import com.hal1ucinogen.systembarsmodernizer.bean.SpacingType
+import com.hal1ucinogen.systembarsmodernizer.bean.ViewAction
 
 class ExtraActionAdapter(
     var isEditable: Boolean = true,
@@ -26,17 +29,20 @@ class ExtraActionAdapter(
         tvViewId.text = idDisplay
 
         val summary = buildString {
-            if (item.isGone) {
-                append("GONE")
-            } else {
-                append(if (item.isPadding) "Padding" else "Margin")
-                append(" • ")
-                append(if (item.isTop) "Top" else "Bottom")
-                append(" • ")
-                if (item.useSystemInsets) {
-                    append("System Inset")
-                } else {
-                    append("${item.customInset}px")
+            when (val act = item.action) {
+                is ViewAction.Visibility -> {
+                    append(act.mode.name)
+                }
+                is ViewAction.Inset -> {
+                    append(if (act.spacingType == SpacingType.PADDING) "Padding" else "Margin")
+                    append(" • ")
+                    append(if (act.edge == InsetEdge.TOP) "Top" else "Bottom")
+                    append(" • ")
+                    if (act.useSystemInsets) {
+                        append("System Inset")
+                    } else {
+                        append("${act.customInset}px")
+                    }
                 }
             }
             if (item.isGroup) {

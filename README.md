@@ -110,54 +110,85 @@ data class PageConfig(
 
 ### 2. `ExtraAction` 结构与典型场景
 
+`ExtraAction` 采用**组合设计模式**，将通用的视图定位与时机过滤（Target & Scope）同具体的布局动作载荷（`ViewAction`）彻底解耦：
+
 ```kotlin
+// 通用定位与生效条件
 data class ExtraAction(
     val viewId: String,               // 目标 View ID（如 "decor"、"content" 或具体 R.id 名称）
     val isGroup: Boolean = false,      // 是否作为 ViewGroup 查找子 View
-    val isTop: Boolean = false,        // 针对顶部（状态栏）还是底部（导航栏）
-    val isPadding: Boolean = true,     // true 表示修改 Padding，false 表示修改 Margin
-    val useSystemInsets: Boolean = false, // 是否自动使用系统栏高度作为边距
-    val customInset: Int = -1,         // 自定义边距像素值（设为 0 即清空边距）
     val self: Boolean = true,          // 是否作用于自身（false 则作用于 childIndex 对应子 View）
     val childIndex: Int = -1,          // 目标子 View 索引（如 0）
-    val isGone: Boolean = false,       // 是否强制设为 View.GONE 消除占位 View
     val delay: Long = 100L,            // 动作执行延迟时间（毫秒，默认 100ms）
-    val routes: List<String> = emptyList(), // 路由过滤关键字列表（支持匹配 Intent 中的 url/data）
-    val isRouteExclusive: Boolean = false   // 路由过滤模式（true 为黑名单排除模式，false 为白名单包含模式）
+    val routes: List<String> = emptyList(), // 路由过滤关键字列表（匹配 Intent 中的 url/data）
+    val isRouteExclusive: Boolean = false,  // 路由过滤模式（true 为黑名单排除，false 为白名单包含）
+    val action: ViewAction = ViewAction.Inset() // 具体的布局修改动作（密封类型体系）
 )
+
+// 密封动作体系（ViewAction）
+sealed interface ViewAction {
+    // 边距与 Inset 调整（Padding 或 Margin）
+    data class Inset(
+        val spacingType: SpacingType = SpacingType.PADDING, // PADDING 或 MARGIN
+        val edge: InsetEdge = InsetEdge.BOTTOM,             // TOP（状态栏）或 BOTTOM（导航栏）
+        val useSystemInsets: Boolean = false,               // 是否自动采用系统栏动态高度
+        val customInset: Int = -1                           // 自定义边距像素值（设为 0 即清空边距）
+    ) : ViewAction
+
+    // 视图可见性调整
+    data class Visibility(
+        val mode: VisibilityMode = VisibilityMode.GONE,     // GONE、INVISIBLE 或 VISIBLE
+        val collapseSize: Boolean = true                   // 是否在隐藏时将高度折叠归零
+    ) : ViewAction
+}
 ```
 
 #### 常见额外动作配置范式：
 
 - **场景 1：清空特定容器 View 的底部 Padding（解决 Web/Hybrid 容器底部留白）**
   ```kotlin
-  ExtraAction(viewId = "web_root_container", isTop = false, isPadding = true, customInset = 0)
+  ExtraAction(
+      viewId = "web_root_container",
+      action = ViewAction.Inset(spacingType = SpacingType.PADDING, edge = InsetEdge.BOTTOM, customInset = 0)
+  )
   ```
 - **场景 2：清空 DecorView 第 1 个子容器的底部 Margin（解决多层容器嵌套下的黑底）**
   ```kotlin
-  ExtraAction(viewId = "decor", isGroup = true, self = false, childIndex = 0, isTop = false, isPadding = false, customInset = 0)
+  ExtraAction(
+      viewId = "decor", isGroup = true, self = false, childIndex = 0,
+      action = ViewAction.Inset(spacingType = SpacingType.MARGIN, edge = InsetEdge.BOTTOM, customInset = 0)
+  )
   ```
 - **场景 3：隐藏硬编码的导航栏占位 View（解决底部多余的空白占位条）**
   ```kotlin
-  ExtraAction(viewId = "nav_placeholder_view", isGone = true)
+  ExtraAction(
+      viewId = "nav_placeholder_view",
+      action = ViewAction.Visibility(mode = VisibilityMode.GONE)
+  )
   ```
 - **场景 4：裁剪隐藏底部导航栏的无用 Tab（实现底栏功能净化与自适应均分）**
   ```kotlin
   // 查找底栏 ViewGroup（如 "tabs"），将其第 2 个子 Tab 设为 GONE，剩余 Tab 自动均分平铺
-  ExtraAction(viewId = "tabs", isGroup = true, self = false, childIndex = 1, isGone = true)
+  ExtraAction(
+      viewId = "tabs", isGroup = true, self = false, childIndex = 1,
+      action = ViewAction.Visibility(mode = VisibilityMode.GONE)
+  )
   ```
 - **场景 5：针对异步渲染/慢加载视图的延迟动作**
   ```kotlin
   // 针对网络返回后才动态插入的容器，设置 500ms 延迟后精准执行
-  ExtraAction(viewId = "bottom_floating_bar", isGone = true, delay = 500L)
+  ExtraAction(
+      viewId = "bottom_floating_bar", delay = 500L,
+      action = ViewAction.Visibility(mode = VisibilityMode.GONE)
+  )
   ```
 - **场景 6：混合框架（如 FlutterBoost）基于 Intent 路由黑/白名单过滤**
   ```kotlin
   // 针对通用容器 Activity，清空列表页的 Margin，但排除聊天等带底栏的路由页面
   ExtraAction(
       viewId = "decor", isGroup = true, self = false, childIndex = 0,
-      isTop = false, isPadding = false, customInset = 0,
-      routes = listOf("x_chat"), isRouteExclusive = true
+      routes = listOf("x_chat"), isRouteExclusive = true,
+      action = ViewAction.Inset(spacingType = SpacingType.MARGIN, edge = InsetEdge.BOTTOM, customInset = 0)
   )
   ```
 
@@ -185,7 +216,7 @@ data class ExtraAction(
 | :--- | :--- | :---: |
 | **Padding 动态矫正** | `View.setPadding` / `setPaddingRelative` | 💯 **100% 永久有效** |
 | **Margin 参数改写** | `View.setLayoutParams` (`MarginLayoutParams`) | 💯 **100% 永久有效** |
-| **占位 View 抹除** | `View.setVisibility` (`ExtraAction.isGone`) | 💯 **100% 永久有效** |
+| **占位 View 抹除** | `View.setVisibility` (`ViewAction.Visibility`) | 💯 **100% 永久有效** |
 | **DecorView 索引定位** | `decorView.getChildAt(index)` | 💯 **100% 永久有效** |
 
 > [!TIP]
@@ -204,7 +235,7 @@ data class ExtraAction(
   - [x] 采用 Room 数据库 + MVVM + DiffUtil 极速流畅渲染与实时搜索。
 - [x] **可视化规则动态编辑器（Rule Editor & CRUD）**：
   - [x] 支持按应用查看与精细化管理全局规则（GeneralConfig）、排除页面（exclusive）及专属页面规则（PageConfig）；
-  - [x] ExtraAction 动作可视化配置：Padding/Margin 改写、系统 Insets 注入、占位 View 隐藏（`isGone`）与 DecorView 索引定位；
+  - [x] ExtraAction 动作可视化配置：Padding/Margin 改写、系统 Insets 注入、占位 View 隐藏（`GONE` / `INVISIBLE`）与 DecorView 索引定位；
   - [x] Activity 智能选择器（支持已声明 Activity 列表读取与 `*` 通配符/自定义类名输入）。
 - [x] **配置实时热同步（Sync to LSPosed / Hook Engine）**：
   - [x] 规则保存后动态写入并推送至 `RemotePreferences`；

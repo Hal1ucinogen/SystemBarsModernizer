@@ -4,7 +4,11 @@ import android.graphics.Color
 import com.hal1ucinogen.systembarsmodernizer.bean.AppConfig
 import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
 import com.hal1ucinogen.systembarsmodernizer.bean.GeneralConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.InsetEdge
 import com.hal1ucinogen.systembarsmodernizer.bean.PageConfig
+import com.hal1ucinogen.systembarsmodernizer.bean.SpacingType
+import com.hal1ucinogen.systembarsmodernizer.bean.ViewAction
+import com.hal1ucinogen.systembarsmodernizer.bean.VisibilityMode
 
 object DefaultConfigs {
     val configs = listOf(
@@ -32,10 +36,12 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = false,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.MARGIN,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 ),
@@ -47,10 +53,12 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = false,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.MARGIN,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 ),
@@ -62,12 +70,14 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = false,
-                            useSystemInsets = false,
-                            customInset = 0,
                             routes = listOf("x_chat", "rate_detail", "order_detail_new"),
-                            isRouteExclusive = true
+                            isRouteExclusive = true,
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.MARGIN,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 )
@@ -91,21 +101,24 @@ object DefaultConfigs {
                     windowBackgroundColor = Color.WHITE,
                     extraActions = listOf(
 //                        ExtraAction(
-//                            "navigation_fragment",
+//                            viewId = "navigation_fragment",
 //                            isGroup = true,
 //                            self = true,
-//                            isPadding = false,
-//                            isTop = false,
-//                            useSystemInsets = true
+//                            action = ViewAction.Inset(
+//                                spacingType = SpacingType.MARGIN,
+//                                edge = InsetEdge.BOTTOM,
+//                                useSystemInsets = true
+//                            )
 //                        ),
-                        ExtraAction
-                            (
+                        ExtraAction(
                             viewId = "bottomMenu_Code",
                             isGroup = true,
                             self = false,
                             childIndex = 1,
-                            isGone = true,
-                                    delay = 1000L
+                            delay = 1000L,
+                            action = ViewAction.Visibility(
+                                mode = VisibilityMode.GONE
+                            )
                         )
                     )
                 )*/
@@ -136,13 +149,14 @@ object DefaultConfigs {
                     navigationColor = Color.TRANSPARENT,
                     windowBackgroundColor = Color.WHITE,
                     extraActions = listOf(
-                        ExtraAction
-                            (
+                        ExtraAction(
                             viewId = "tabs",
                             isGroup = true,
                             self = false,
                             childIndex = 1,
-                            isGone = true
+                            action = ViewAction.Visibility(
+                                mode = VisibilityMode.GONE
+                            )
                         )
                     )
                 ),
@@ -154,10 +168,12 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = false,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.MARGIN,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 ),
@@ -169,10 +185,12 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = false,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.MARGIN,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 ),
@@ -184,10 +202,12 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = false,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.MARGIN,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 )
@@ -229,12 +249,14 @@ object DefaultConfigs {
                     edgeToEdge = true,
                     extraActions = listOf(
                         ExtraAction(
-                            "social_action_bar",
-                            true,
-                            false,
-                            false,
-                            true,
-                            self = true
+                            viewId = "social_action_bar",
+                            isGroup = true,
+                            self = true,
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.MARGIN,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = true
+                            )
                         )
                     )
                 ),
@@ -257,14 +279,16 @@ object DefaultConfigs {
                     edgeToEdge = true,
                     extraActions = listOf(
                         ExtraAction(
-                            "comp_uc_container",
-                            true,
-                            false,
-                            true,
-                            false,
-                            0,
-                            false,
-                            0
+                            viewId = "comp_uc_container",
+                            isGroup = true,
+                            self = false,
+                            childIndex = 0,
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.PADDING,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 )
@@ -296,10 +320,12 @@ object DefaultConfigs {
                         ExtraAction(
                             viewId = "nebulax_root_view",
                             isGroup = false,
-                            isTop = false,
-                            isPadding = true,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.PADDING,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 ),
@@ -308,7 +334,9 @@ object DefaultConfigs {
                     extraActions = listOf(
                         ExtraAction(
                             viewId = "v_navbar_placeholder",
-                            isGone = true
+                            action = ViewAction.Visibility(
+                                mode = VisibilityMode.GONE
+                            )
                         )
                     )
                 ),
@@ -320,10 +348,12 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = true,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.PADDING,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 ),
@@ -335,10 +365,12 @@ object DefaultConfigs {
                             isGroup = true,
                             self = false,
                             childIndex = 0,
-                            isTop = false,
-                            isPadding = true,
-                            useSystemInsets = false,
-                            customInset = 0
+                            action = ViewAction.Inset(
+                                spacingType = SpacingType.PADDING,
+                                edge = InsetEdge.BOTTOM,
+                                useSystemInsets = false,
+                                customInset = 0
+                            )
                         )
                     )
                 ),

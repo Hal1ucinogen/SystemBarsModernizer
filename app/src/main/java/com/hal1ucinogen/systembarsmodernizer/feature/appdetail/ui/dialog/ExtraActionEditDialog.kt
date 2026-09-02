@@ -7,6 +7,10 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.hal1ucinogen.systembarsmodernizer.R
 import com.hal1ucinogen.systembarsmodernizer.bean.ExtraAction
+import com.hal1ucinogen.systembarsmodernizer.bean.InsetEdge
+import com.hal1ucinogen.systembarsmodernizer.bean.SpacingType
+import com.hal1ucinogen.systembarsmodernizer.bean.ViewAction
+import com.hal1ucinogen.systembarsmodernizer.bean.VisibilityMode
 import com.hal1ucinogen.systembarsmodernizer.databinding.DialogExtraActionEditBinding
 
 class ExtraActionEditDialog(
@@ -33,21 +37,32 @@ class ExtraActionEditDialog(
         initialAction?.let { action ->
             binding.etViewId.setText(action.viewId)
 
-            when {
-                action.isGone -> binding.rbGone.isChecked = true
-                action.isPadding -> binding.rbPadding.isChecked = true
-                else -> binding.rbMargin.isChecked = true
-            }
+            when (val act = action.action) {
+                is ViewAction.Visibility -> {
+                    if (act.mode == VisibilityMode.INVISIBLE) {
+                        binding.rbInvisible.isChecked = true
+                    } else {
+                        binding.rbGone.isChecked = true
+                    }
+                }
+                is ViewAction.Inset -> {
+                    if (act.spacingType == SpacingType.PADDING) {
+                        binding.rbPadding.isChecked = true
+                    } else {
+                        binding.rbMargin.isChecked = true
+                    }
 
-            if (action.isTop) {
-                binding.rbStatusBar.isChecked = true
-            } else {
-                binding.rbNavBar.isChecked = true
-            }
+                    if (act.edge == InsetEdge.TOP) {
+                        binding.rbStatusBar.isChecked = true
+                    } else {
+                        binding.rbNavBar.isChecked = true
+                    }
 
-            binding.switchUseSystemInsets.isChecked = action.useSystemInsets
-            if (action.customInset >= 0) {
-                binding.etCustomInset.setText(action.customInset.toString())
+                    binding.switchUseSystemInsets.isChecked = act.useSystemInsets
+                    if (act.customInset >= 0) {
+                        binding.etCustomInset.setText(act.customInset.toString())
+                    }
+                }
             }
 
             binding.switchIsGroup.isChecked = action.isGroup
@@ -65,9 +80,9 @@ class ExtraActionEditDialog(
         }
 
         fun updateVisibility() {
-            val isGone = binding.rbGone.isChecked
-            binding.layoutBarDirection.visibility = if (isGone) View.GONE else View.VISIBLE
-            binding.layoutInsetSettings.visibility = if (isGone) View.GONE else View.VISIBLE
+            val isVisibilityAction = binding.rbGone.isChecked || binding.rbInvisible.isChecked
+            binding.layoutBarDirection.visibility = if (isVisibilityAction) View.GONE else View.VISIBLE
+            binding.layoutInsetSettings.visibility = if (isVisibilityAction) View.GONE else View.VISIBLE
         }
 
         binding.rgActionType.setOnCheckedChangeListener { _, _ -> updateVisibility() }
@@ -84,11 +99,24 @@ class ExtraActionEditDialog(
                 return@setOnClickListener
             }
 
-            val isGone = binding.rbGone.isChecked
-            val isPadding = binding.rbPadding.isChecked
-            val isTop = binding.rbStatusBar.isChecked
-            val useSystemInsets = binding.switchUseSystemInsets.isChecked
-            val customInset = binding.etCustomInset.text?.toString()?.toIntOrNull() ?: 0
+            val actionPayload: ViewAction = if (binding.rbGone.isChecked || binding.rbInvisible.isChecked) {
+                ViewAction.Visibility(
+                    mode = if (binding.rbInvisible.isChecked) VisibilityMode.INVISIBLE else VisibilityMode.GONE,
+                    collapseSize = true
+                )
+            } else {
+                val spacingType = if (binding.rbPadding.isChecked) SpacingType.PADDING else SpacingType.MARGIN
+                val edge = if (binding.rbStatusBar.isChecked) InsetEdge.TOP else InsetEdge.BOTTOM
+                val useSystemInsets = binding.switchUseSystemInsets.isChecked
+                val customInset = binding.etCustomInset.text?.toString()?.toIntOrNull() ?: 0
+                ViewAction.Inset(
+                    spacingType = spacingType,
+                    edge = edge,
+                    useSystemInsets = useSystemInsets,
+                    customInset = customInset
+                )
+            }
+
             val isGroup = binding.switchIsGroup.isChecked
             val self = binding.switchSelf.isChecked
             val childIndex = binding.etChildIndex.text?.toString()?.toIntOrNull() ?: -1
@@ -102,16 +130,12 @@ class ExtraActionEditDialog(
             val action = ExtraAction(
                 viewId = viewId,
                 isGroup = isGroup,
-                isTop = isTop,
-                isPadding = isPadding,
-                useSystemInsets = useSystemInsets,
-                customInset = customInset,
                 self = self,
                 childIndex = childIndex,
-                isGone = isGone,
                 delay = delay,
                 routes = routes,
-                isRouteExclusive = isRouteExclusive
+                isRouteExclusive = isRouteExclusive,
+                action = actionPayload
             )
 
             onActionSaved(action)
