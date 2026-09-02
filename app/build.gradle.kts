@@ -13,11 +13,27 @@ android {
         applicationId = "com.hal1ucinogen.systembarsmodernizer"
         minSdk = 29
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 101
+        versionName = "0.1.1"
 
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystoreFile = rootProject.file("sbm.keystore")
+            val storePass = System.getenv("KEYSTORE_PASSWORD")
+            val keyAliasStr = System.getenv("KEY_ALIAS")
+            val keyPass = System.getenv("KEY_PASSWORD") ?: storePass
+
+            if (keystoreFile.exists() && !storePass.isNullOrBlank() && !keyAliasStr.isNullOrBlank()) {
+                storeFile = keystoreFile
+                storePassword = storePass
+                keyAlias = keyAliasStr
+                keyPassword = keyPass
+            }
         }
     }
 
@@ -35,6 +51,20 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfigs.findByName("release")?.let { releaseConfig ->
+                if (releaseConfig.storeFile != null) {
+                    signingConfig = releaseConfig
+                }
+            }
+        }
+    }
+
+    applicationVariants.all {
+        if (buildType.name == "release") {
+            outputs.all {
+                (this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl)?.outputFileName =
+                    "Edgefitter-v${versionName}.apk"
+            }
         }
     }
     buildFeatures {
